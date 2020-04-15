@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Mail Sender App</title>
+    </h:head>
+    <h:body>
+        <h1>Add clients</h1>
+        <h:outputText value="Logged as: #{clientManagement.loggedUser.userMail}"/>
+        <nav>
+            <ul>
+                <li><a href="index.xhtml">Strona główna</a></li>
+                <li><a href="recipients.xhtml">Lista odbiorców</a></li>
+                <li><a href="sentMessages.xhtml">Wysłane</a></li>
+                <li><a href="addClients.xhtml">Dodaj odbiorców</a></li>
+            </ul>
+        </nav>
+        <h:form id="clientsForm">
+            <c:forEach items="#{clientManagement.clientsList}" var="client">
+                <h:outputText value="Client Name"/>
+                <h:inputText id="clientName" value="#{client.name}"></h:inputText>
+                <h:outputText value="Client company name" />
+                <h:inputText id="clientCompany" value="#{client.companyName}"></h:inputText>
+                <h:outputText value="Website" />
+                <h:inputText id="clientWebsit" value="#{client.website}"></h:inputText>
+                <h:outputText value="Client Email"/>
+                <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>          
+            </c:forEach>
+            <h:commandButton value="Add client" action="#{clientManagement.addClients()}" immediate="true">
+                <f:ajax render="clientsForm" /> 
+            </h:commandButton>
+            <h:commandButton id="saveClients" value="Save clients" action="#{clientManagement.saveClient}">
+            </h:commandButton><br></br>
+            <h:messages for="saveClients"/>
+        </h:form>
+    </h:body>
+</html>
+

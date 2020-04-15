@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Mail Sender App</title>
+        <link type="text/css" rel="stylesheet" href="styles/index.css"/>
+    </h:head>
+    <h:body>
+        <h1>App Intro</h1>
+        <div class="indexContainer">
+        <div> 
+            <p>
+                This app is designed to allow users to send emails to all customers with just one click. This app allows you to get your own database of your customers emails and send one message to everybody you selected from that list. After you've selected all emails you want to send message to you will recive message containing information like:</p>
+            <ul>
+                <li>How many messages has been delivered</li>
+                <li>How many messages has not been delivered</li>
+                <li>Whose email account is no longer valid</li>
+                <li>How much time did it take to send emails to everybody</li>                            
+            </ul>
+            <p>
+                My app will allow you to automatically delete those accounts which are not more valid. You may schedule your tasks so you can send email at specified hour of a day.   
+            </p>
+        </div>
+        <h:form>
+            <h:commandButton class="formButton" value="Zaloguj" action="/Login?faces-redirect=true"/>
+            <h:commandButton class="formButton" value="Zarejestruj się" action="/registrationFlow/registrationFlow?faces-redirect=true" immediate="true"/>
+        </h:form>
+        </div>
+    </h:body>
+</html>
+

@@ -1,0 +1,66 @@
+body {    
+    height: 100%;
+    width: 100%;
+    background: rgb(65,65,65);
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.recipientsContainer {
+    padding: 30px;
+    background: rgb(220,220,220);
+    width: 70vw;
+}
+
+.recipientsNames {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(65,65,65,0.5);
+}
+
+.recipientsNames > div {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 5px;
+}
+
+.recipients {
+    padding: 15px 0;
+    display: flex;    
+    width: 100%;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+.recipientsData {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.recipientsData > div {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 5px;
+    margin: 0 auto;
+}
+
+.recipientForm .recipientsButton {
+    padding: 5px 10px;
+    border: none;
+    height: 50px;
+}
+
+form.recipientsButton:hover {
+    background: yellow;
+}
+
