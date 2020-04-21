@@ -9,8 +9,12 @@
     </h:head>
     <h:body>
         <h1>Add clients to registered user</h1>
+        <p>
+            #{ null != facesContext.application.flowHandler.currentFlow}
+            #{facesContext.application.flowHandler.currentFlow.id}
+        </p>
         <h:form id="clientsForm">
-            <c:forEach items="#{clientManagement.clientsList}" var="client">
+            <c:forEach items="#{registration.clientsList}" var="client">
                 <h:outputText value="Client Name"/>
                 <h:inputText id="clientName" value="#{client.name}"></h:inputText>
                 <h:outputText value="Client company name" />
@@ -20,10 +24,10 @@
                 <h:outputText value="Client Email"/>
                 <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>          
             </c:forEach>
-            <h:commandButton value="Add client" action="#{clientManagement.addClients()}" immediate="true">
-                <f:ajax render="clientsForm" /> 
+            <h:commandButton value="Add client" action="#{registration.addClients()}" immediate="true">
+                <f:ajax execute="@form" render="clientsForm" /> 
             </h:commandButton>
-            <h:commandButton id="saveClients" value="Save clients" action="#{clientManagement.saveClient}">
+            <h:commandButton id="saveClients" value="Save clients" action="#{registration.saveClient}">
             </h:commandButton><br></br>
             <h:messages for="saveClients"/>
         </h:form>

@@ -21,10 +21,14 @@
             <p>
                 My app will allow you to automatically delete those accounts which are not more valid. You may schedule your tasks so you can send email at specified hour of a day.   
             </p>
+            <p>
+                #{ null != facesContext.application.flowHandler.currentFlow}
+                #{facesContext.application.flowHandler.currentFlow.id}
+            </p>
         </div>
         <h:form>
             <h:commandButton class="formButton" value="Zaloguj" action="/Login?faces-redirect=true"/>
-            <h:commandButton class="formButton" value="Zarejestruj się" action="/registrationFlow/registrationFlow?faces-redirect=true" immediate="true"/>
+            <h:commandButton class="formButton" value="Zarejestruj się" action="registration" immediate="true"/>
         </h:form>
         </div>
     </h:body>

@@ -51,7 +51,7 @@ public class MailSend implements Serializable {
         }
     }
 
-    public void send() {
+    public void sendMessage() {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -67,22 +67,25 @@ public class MailSend implements Serializable {
                 return new PasswordAuthentication("banialczele@gmail.com", "dupa4ever");
             }
         });
+        String[] emails = subject.split("\\s");
+        System.out.println(emails);
         System.out.println("Trying to send an email");
 
-//        try {
-//            for (String email : emailList) {
-//                Message message = new MimeMessage(session);
-//                message.setFrom(new InternetAddress("banialczele@gmail.com"));
-//                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-//                message.setSubject(topic);
-//                message.setText(content);
-//                Transport.send(message);
-//            }
-//            System.out.println("Done");
-//        } catch (MessagingException mes) {
-//            System.out.println(mes);
-//
-//        }
+        try {
+            for (String email : emails) {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress("banialczele@gmail.com"));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+                message.setSubject(topic);
+                message.setText(content);
+                Transport.send(message);
+                System.out.println(message);
+            }
+            System.out.println("Done");
+        } catch (MessagingException mes) {
+            System.out.println(mes);
+
+        }
     }
 
     public List<String> getEmailList() {
@@ -100,6 +103,7 @@ public class MailSend implements Serializable {
 //    public void setEmailList(List<Client> emailList) {
 //        this.emailList = emailList;
 //    }
+    
     public String getTopic() {
         return topic;
     }

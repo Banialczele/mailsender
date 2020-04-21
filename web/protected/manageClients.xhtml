@@ -3,36 +3,40 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      >
     <h:head>
-        <title>Mail Sender App</title>
+        <title>Mail Sender App</title>        
+        <link rel="stylesheet" href="../styles/navStyle.css" type="text/css"/>
     </h:head>
     <h:body>
         <h1>Add clients</h1>
-        <h:outputText value="Logged as: #{clientManagement.loggedUser.userMail}"/>
         <nav>
             <ul>
-                <li><a href="index.xhtml">Strona główna</a></li>
+                <li><a href="mainPage.xhtml">Strona główna</a></li>
                 <li><a href="recipients.xhtml">Lista odbiorców</a></li>
                 <li><a href="sentMessages.xhtml">Wysłane</a></li>
-                <li><a href="addClients.xhtml">Dodaj odbiorców</a></li>
+                <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
             </ul>
         </nav>
-        <h:form id="clientsForm">
-            <c:forEach items="#{clientManagement.clientsList}" var="client">
+        <h:form id="clientForm">            
+            <c:forEach items="#{myClient.clientList}" var="client">
                 <h:outputText value="Client Name"/>
                 <h:inputText id="clientName" value="#{client.name}"></h:inputText>
+
                 <h:outputText value="Client company name" />
                 <h:inputText id="clientCompany" value="#{client.companyName}"></h:inputText>
+
                 <h:outputText value="Website" />
                 <h:inputText id="clientWebsit" value="#{client.website}"></h:inputText>
+
                 <h:outputText value="Client Email"/>
-                <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>          
+                <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>     
             </c:forEach>
-            <h:commandButton value="Add client" action="#{clientManagement.addClients()}" immediate="true">
-                <f:ajax render="clientsForm" /> 
+            <h:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true">
+                <f:ajax execute="@form" render="clientForm" /> 
             </h:commandButton>
-            <h:commandButton id="saveClients" value="Save clients" action="#{clientManagement.saveClient}">
+            <h:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
             </h:commandButton><br></br>
             <h:messages for="saveClients"/>
         </h:form>

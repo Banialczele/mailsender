@@ -65,13 +65,14 @@ public class Login implements Serializable {
         User user;
         user = userDAO.userLogin(email, password);
         loggedIn = true;
+        System.out.println(user);
         if (user != null) {
             HttpSession session = SessionUtil.getSession();
             session.setAttribute("username", user.getUsername());
             session.setAttribute("userid", user.getIdUser());
             loggedUser = user;
             session.setAttribute("user", loggedUser);
-            return "/protected/index?faces-redirect=true";
+            return "/protected/mainPage?faces-redirect=true";
         } else {
             FacesContext ctx = FacesContext.getCurrentInstance();
             ctx.addMessage(null, new FacesMessage("Unable to login, please check username and password"));
