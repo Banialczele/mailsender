@@ -84,7 +84,6 @@ public class MailSend implements Serializable {
             System.out.println("Done");
         } catch (MessagingException mes) {
             System.out.println(mes);
-
         }
     }
 

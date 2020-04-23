@@ -96,11 +96,7 @@ public class Registration implements Serializable {
         });
         return "/protected/mainPage.xhtml?faces-redirect=true";
     }
-
-    public void delete(Client client) {
-        clientDAO.remove(client);
-    }
-
+    
     public String getUsername() {
         return username;
     }

@@ -36,7 +36,7 @@
                 <h:inputTextarea value="#{mailSend.content}"/>
                 <br></br>
                 <h:commandButton value="Wyślij wiadomość" action="#{mailSend.sendMessage()}"/>
-                <h:commandButton action="#{logout.logout}" value="wyloguj"></h:commandButton>
+                <h:commandButton action="#{logout.logout()}" value="wyloguj"></h:commandButton>
             </h:form>
         </div>
     </h:body>
