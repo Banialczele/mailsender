@@ -16,7 +16,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 @Named
-@FlowScoped(value="registration")
+@FlowScoped(value = "registration")
 public class Registration implements Serializable {
 
     @Inject
@@ -40,8 +40,19 @@ public class Registration implements Serializable {
 
     public String register() {
         boolean validateEmail = validateEmail(email);
+        User usedMail = userDAO.checkIfEmailInUse(email);
         User existingUser = userDAO.checkIfExists(username, email);
-        if (existingUser == null && validateEmail) {
+        if (validateEmail == false) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Provided email is invalid", null);
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            ctx.addMessage("registerForm:register", message);
+            return null;
+        } else if (usedMail != null) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Email " + getEmail() + " is already in use", null);
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            ctx.addMessage("registerForm:register", message);
+            return null;
+        } else if (existingUser == null && validateEmail && usedMail == null) {
             User newUser = new User();
             newUser.setUsername(username);
             newUser.setPassword(password);
@@ -50,7 +61,7 @@ public class Registration implements Serializable {
             newUser.setUserMail(email);
             newUser.setUserRole("user");
             try {
-                userDAO.add(newUser);
+                userDAO.create(newUser);
                 HttpSession session = SessionUtil.getSession();
                 System.out.println("Session id from registration: " + session.getId());
                 session.setAttribute("username", username);
@@ -61,11 +72,6 @@ public class Registration implements Serializable {
                 throw new Error(e);
             }
             return "addClients?faces-redirect=true";
-        } else if (validateEmail == false) {
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Provided email is invalid", null);
-            FacesContext ctx = FacesContext.getCurrentInstance();
-            ctx.addMessage("registerForm:register", message);
-            System.out.println("wrong email");
         }
         return null;
     }
@@ -76,27 +82,25 @@ public class Registration implements Serializable {
 
     public String saveClient() {
         clientsList.forEach((client) -> {
-            boolean validateEmail = validateEmail(client.getClientEmail());
+            boolean validateEmail = validateEmail(client.getEmail());
             if (validateEmail) {
                 Client newClient = new Client();
                 newClient.setName(client.getName());
-                newClient.setCompanyName(client.getCompanyName());
-                newClient.setWebsite(client.getWebsite());
-                newClient.setClientEmail(client.getClientEmail());
-                newClient.setUserid(loggedUser);
+                newClient.setEmail(client.getEmail());
+                newClient.setIdUser(loggedUser);
                 try {
-                    clientDAO.add(newClient);
+                    clientDAO.create(newClient);
                 } catch (Exception e) {
                     throw new Error(e);
                 }
             } else if (validateEmail == false) {
                 FacesContext ctx = FacesContext.getCurrentInstance();
-                ctx.addMessage("clientsForm:saveClients", new FacesMessage("Provided email is invalid." + client.getClientEmail()));
+                ctx.addMessage("clientsForm:saveClients", new FacesMessage("Provided email is invalid." + client.getEmail()));
             }
         });
         return "/protected/mainPage.xhtml?faces-redirect=true";
     }
-    
+
     public String getUsername() {
         return username;
     }

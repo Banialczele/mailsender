@@ -25,6 +25,32 @@ public class Login implements Serializable {
     private User loggedUser;
     private boolean loggedIn;
 
+    //validate credentials
+    public String doLogin() throws IOException, ServletException {
+        User user = userDAO.validateCredentials(email, password);
+        if (user != null) {
+            loggedIn = true;
+            HttpSession session = SessionUtil.getSession();
+            session.setAttribute("username", user.getUsername());
+            session.setAttribute("userid", user.getIdUser());
+            loggedUser = user;
+            session.setAttribute("user", loggedUser);
+            return "/protected/mainPage?faces-redirect=true";
+        } else {
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            ctx.addMessage(null, new FacesMessage("Unable to login, please check username and password"));
+            return "index?faces-redirect=true";
+        }
+    }
+
+    public String logout() {
+        loggedIn = false;
+        FacesMessage msg = new FacesMessage("Logout success", "INFO MSG");
+        msg.setSeverity(FacesMessage.SEVERITY_INFO);
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        return "/index?faces-redirect=true";
+    }
+
     public String getEmail() {
         return email;
     }
@@ -58,33 +84,5 @@ public class Login implements Serializable {
     }
 
     public Login() {
-    }
-
-    //validate credentials
-    public String doLogin() throws IOException, ServletException {
-        User user;
-        user = userDAO.userLogin(email, password);
-        loggedIn = true;
-        System.out.println(user);
-        if (user != null) {
-            HttpSession session = SessionUtil.getSession();
-            session.setAttribute("username", user.getUsername());
-            session.setAttribute("userid", user.getIdUser());
-            loggedUser = user;
-            session.setAttribute("user", loggedUser);
-            return "/protected/mainPage?faces-redirect=true";
-        } else {
-            FacesContext ctx = FacesContext.getCurrentInstance();
-            ctx.addMessage(null, new FacesMessage("Unable to login, please check username and password"));
-            return "index?faces-redirect=true";
-        }
-    }
-
-    public String logout() {
-        loggedIn = false;
-        FacesMessage msg = new FacesMessage("Logout success", "INFO MSG");
-        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        return "/index?faces-redirect=true";
     }
 }

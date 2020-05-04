@@ -1,0 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.pachole.serviceDAO;
+
+import com.pachole.entities.Etiquette;
+import com.pachole.entities.User;
+import java.util.List;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+/**
+ *
+ * @author marci
+ */
+@Stateless
+public class EtiquetteFacade extends AbstractFacade<Etiquette> {
+
+    @PersistenceContext(unitName = "MailSenderAPPPU")
+    private EntityManager em;
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
+    }
+
+    public EtiquetteFacade() {
+        super(Etiquette.class);
+    }
+
+    @Override
+    public void create(Etiquette etiquette) {
+        getEntityManager().persist(etiquette);
+    }
+
+    public Etiquette checkExistance(String etiquetteName) {
+        Etiquette result;
+        try {
+            result = getEntityManager().createNamedQuery("Etiquette.findByName", Etiquette.class).setParameter("name", etiquetteName).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
+
+    public List<Etiquette> getAllEtiquettes(User userId) {
+        List<Etiquette> result;
+        try {
+            result = getEntityManager().createNamedQuery("Etiquette.findAllByUserId", Etiquette.class).setParameter("idUser", userId).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
+}

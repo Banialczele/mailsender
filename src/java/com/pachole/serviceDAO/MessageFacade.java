@@ -5,7 +5,7 @@
  */
 package com.pachole.serviceDAO;
 
-import com.pachole.entities.Messagestatus;
+import com.pachole.entities.Message;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,7 +15,7 @@ import javax.persistence.PersistenceContext;
  * @author marci
  */
 @Stateless
-public class MessagestatusFacade extends AbstractFacade<Messagestatus> {
+public class MessageFacade extends AbstractFacade<Message> {
 
     @PersistenceContext(unitName = "MailSenderAPPPU")
     private EntityManager em;
@@ -25,8 +25,8 @@ public class MessagestatusFacade extends AbstractFacade<Messagestatus> {
         return em;
     }
 
-    public MessagestatusFacade() {
-        super(Messagestatus.class);
+    public MessageFacade() {
+        super(Message.class);
     }
     
 }

@@ -1,21 +1,20 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
     <h:head>
         <title>Mail Sender App</title>
-        <link rel="stylesheet" href="../styles/navStyle.css" type="text/css"/>
-        <link rel="stylesheet" href="../styles/mainPage.css" type="text/css"/>
+        <h:outputStylesheet name="css/navStyle.css" />
+        <h:outputStylesheet name="css/mainPage.css" />
     </h:head>
     <h:body>
         <h1>Send email to users</h1>
         <nav>
             <ul>
-                <li><a href="recipients.xhtml">Lista odbiorców</a></li>
+                <li><a href="groups.xhtml">Lista etykiet</a></li>
                 <li><a href="sentMessages.xhtml">Wysłane</a></li>
                 <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
+                <li><a href="addGroup.xhtml">Dodaj etykiete</a></li>
             </ul>
         </nav>
         <div class="senderContainer">
@@ -23,14 +22,10 @@
                 <h:outputText value="Tytuł"/>
                 <h:inputText value="#{mailSend.topic}"></h:inputText>
                 <br></br>
-                <h:outputText value="Odbiorca"/>
+                <h:outputText value="Grupa odbiorców"/>
                 <h:inputText value="#{mailSend.subject}"></h:inputText>
-                <br></br>
-                <h:commandButton value="Dodaj wszystkich klientów" action="#{mailSend.addEmails()}" immediate="true">
-                    <ui:repeat value="#{mailSend.emailList}" var="email">
-                        <div>#{email}</div> 
-                    </ui:repeat>
-                </h:commandButton><br></br>            
+                <h:commandButton value="Wybierz odbiorców" action="#{mailSend.etiquetteList}"/>
+                <br></br>           
                 <h:outputText value="Wiadomość"></h:outputText>
                 <br></br>
                 <h:inputTextarea value="#{mailSend.content}"/>

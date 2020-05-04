@@ -6,7 +6,9 @@
 package com.pachole.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,25 +18,26 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author marci
  */
 @Entity
-@Table(name = "mailaccounts")
+@Table(name = "mailaccount")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Mailaccounts.findAll", query = "SELECT m FROM Mailaccounts m")
-    , @NamedQuery(name = "Mailaccounts.findByIdMailAccounts", query = "SELECT m FROM Mailaccounts m WHERE m.idMailAccounts = :idMailAccounts")
-    , @NamedQuery(name = "Mailaccounts.findByMailAddress", query = "SELECT m FROM Mailaccounts m WHERE m.mailAddress = :mailAddress")
-    , @NamedQuery(name = "Mailaccounts.findByCompanyName", query = "SELECT m FROM Mailaccounts m WHERE m.companyName = :companyName")
-    , @NamedQuery(name = "Mailaccounts.findByCompanyAddress", query = "SELECT m FROM Mailaccounts m WHERE m.companyAddress = :companyAddress")})
-public class Mailaccounts implements Serializable {
+    @NamedQuery(name = "Mailaccount.findAll", query = "SELECT m FROM Mailaccount m")
+    , @NamedQuery(name = "Mailaccount.findByIdMailAccounts", query = "SELECT m FROM Mailaccount m WHERE m.idMailAccounts = :idMailAccounts")
+    , @NamedQuery(name = "Mailaccount.findByMailAddress", query = "SELECT m FROM Mailaccount m WHERE m.mailAddress = :mailAddress")
+    , @NamedQuery(name = "Mailaccount.findByDailyLimit", query = "SELECT m FROM Mailaccount m WHERE m.dailyLimit = :dailyLimit")})
+public class Mailaccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,39 +46,28 @@ public class Mailaccounts implements Serializable {
     @Column(name = "idMailAccounts")
     private Integer idMailAccounts;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "MailAddress")
+    @Column(name = "mailAddress")
     private String mailAddress;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "CompanyName")
-    private String companyName;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "CompanyAddress")
-    private String companyAddress;
-    @JoinColumn(name = "Client_id", referencedColumnName = "idClient")
+    @Column(name = "dailyLimit")
+    private int dailyLimit;
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
-    private Client clientid;
-    @JoinColumn(name = "User_id", referencedColumnName = "idUser")
-    @ManyToOne(optional = false)
-    private User userid;
+    private User idUser;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMailAccounts")
+    private Collection<Mailstatus> mailstatusCollection;
 
-    public Mailaccounts() {
+    public Mailaccount() {
     }
 
-    public Mailaccounts(Integer idMailAccounts) {
+    public Mailaccount(Integer idMailAccounts) {
         this.idMailAccounts = idMailAccounts;
     }
 
-    public Mailaccounts(Integer idMailAccounts, String mailAddress, String companyName, String companyAddress) {
+    public Mailaccount(Integer idMailAccounts, String mailAddress, int dailyLimit) {
         this.idMailAccounts = idMailAccounts;
         this.mailAddress = mailAddress;
-        this.companyName = companyName;
-        this.companyAddress = companyAddress;
+        this.dailyLimit = dailyLimit;
     }
 
     public Integer getIdMailAccounts() {
@@ -94,36 +86,29 @@ public class Mailaccounts implements Serializable {
         this.mailAddress = mailAddress;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public int getDailyLimit() {
+        return dailyLimit;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setDailyLimit(int dailyLimit) {
+        this.dailyLimit = dailyLimit;
     }
 
-    public String getCompanyAddress() {
-        return companyAddress;
+    public User getIdUser() {
+        return idUser;
     }
 
-    public void setCompanyAddress(String companyAddress) {
-        this.companyAddress = companyAddress;
+    public void setIdUser(User idUser) {
+        this.idUser = idUser;
     }
 
-    public Client getClientid() {
-        return clientid;
+    @XmlTransient
+    public Collection<Mailstatus> getMailstatusCollection() {
+        return mailstatusCollection;
     }
 
-    public void setClientid(Client clientid) {
-        this.clientid = clientid;
-    }
-
-    public User getUserid() {
-        return userid;
-    }
-
-    public void setUserid(User userid) {
-        this.userid = userid;
+    public void setMailstatusCollection(Collection<Mailstatus> mailstatusCollection) {
+        this.mailstatusCollection = mailstatusCollection;
     }
 
     @Override
@@ -136,10 +121,10 @@ public class Mailaccounts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Mailaccounts)) {
+        if (!(object instanceof Mailaccount)) {
             return false;
         }
-        Mailaccounts other = (Mailaccounts) object;
+        Mailaccount other = (Mailaccount) object;
         if ((this.idMailAccounts == null && other.idMailAccounts != null) || (this.idMailAccounts != null && !this.idMailAccounts.equals(other.idMailAccounts))) {
             return false;
         }
@@ -148,7 +133,7 @@ public class Mailaccounts implements Serializable {
 
     @Override
     public String toString() {
-        return "com.pachole.entities.Mailaccounts[ idMailAccounts=" + idMailAccounts + " ]";
+        return "com.pachole.entities.Mailaccount[ idMailAccounts=" + idMailAccounts + " ]";
     }
     
 }

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+//sparametryzować webfilter w web.xml
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/protected/*"})
 public class AuthorizationFilter implements Filter {
 
@@ -24,7 +25,8 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpSession session = request.getSession(false);
         String loginURL = request.getContextPath() + "/index.xhtml";
-
+        
+        //do sesji przypisać role i ją potem pobierać
         boolean loggedIn = (session != null) && (session.getAttribute("username") != null);
         boolean loginRequest = request.getRequestURI().equals(loginURL);
         boolean resourceRequest = request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");

@@ -7,15 +7,15 @@
       >
     <h:head>
         <title>Mail Sender App</title>
-        <link rel="stylesheet" href="../styles/navStyle.css" type="text/css"/>
-        <link rel="stylesheet" href="../styles/recipients.css" type="text/css"/>
+        <h:outputStylesheet name="../styles/navStyle.css" />
+        <h:outputStylesheet name="../styles/recipients.css"/>
     </h:head>
     <h:body>
         <h1>Lista odbiorców</h1>
         <nav>
             <ul>
                 <li><a href="mainPage.xhtml">Strona główna</a></li>
-                <li><a href="recipients.xhtml">Lista odbiorców</a></li>
+                <li><a href="groups.xhtml">Lista odbiorców</a></li>
                 <li><a href="sentMessages.xhtml">Wysłane</a></li>
                 <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
             </ul>
@@ -38,7 +38,7 @@
                             <div id="email">#{client.clientEmail}</div>
                             <div>
                                 <h:commandButton value="Usuń" action="#{showClients.delete(client)}">
-                                    <f:ajax execute="@form" render="recipientForm"/>
+                                    <f:ajax execute="@form" render="recipientsForm"/>
                                 </h:commandButton>
                             </div>
                         </div>

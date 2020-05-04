@@ -38,10 +38,14 @@ public class MailSend implements Serializable {
     public void init() {
         HttpSession session = SessionUtil.getSession();
         User user = (User) session.getAttribute("user");
-        emailList = clientDAO.findEmailsById(user);
+//        emailList = clientDAO.findEmailsById(user);
     }
 
-    public void addEmails() {        
+    public String etiquetteList() {
+        return "Siemanko";
+    }
+
+    public void addEmails() {
 //        if (subject != null ) {
 //            String[] emails = subject.split("\\s");
 //            emailList.addAll(Arrays.asList(emails));
@@ -102,7 +106,6 @@ public class MailSend implements Serializable {
 //    public void setEmailList(List<Client> emailList) {
 //        this.emailList = emailList;
 //    }
-    
     public String getTopic() {
         return topic;
     }

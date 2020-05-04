@@ -7,31 +7,36 @@
       >
     <h:head>
         <title>Mail Sender App</title>        
-        <link rel="stylesheet" href="../styles/navStyle.css" type="text/css"/>
+        <h:outputStylesheet name="../styles/navStyle.css" />
     </h:head>
     <h:body>
         <h1>Add clients</h1>
         <nav>
             <ul>
                 <li><a href="mainPage.xhtml">Strona główna</a></li>
-                <li><a href="recipients.xhtml">Lista odbiorców</a></li>
+                <li><a href="groups.xhtml">Lista odbiorców</a></li>
                 <li><a href="sentMessages.xhtml">Wysłane</a></li>
                 <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
             </ul>
         </nav>
-        <h:form id="clientForm">            
+        <h:form id="clientForm">
+            <h:outputText value="Choose etiquette"/>
+            <h:selectOneMenu value="#{myClient.etiquetteName}">
+                <f:selectItem itemValue="" itemLabel=""/>
+                <f:selectItems value="#{myClient.existingEtiquettes}" var="etiquette" itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
+            </h:selectOneMenu>
+            
+            <h:outputText value="Add new etiquette"/>
+            <h:inputText id="etiquetteName" value="#{myClient.etiquetteNameFromInput}"></h:inputText>
             <c:forEach items="#{myClient.clientList}" var="client">
                 <h:outputText value="Client Name"/>
                 <h:inputText id="clientName" value="#{client.name}"></h:inputText>
 
-                <h:outputText value="Client company name" />
-                <h:inputText id="clientCompany" value="#{client.companyName}"></h:inputText>
-
-                <h:outputText value="Website" />
-                <h:inputText id="clientWebsit" value="#{client.website}"></h:inputText>
-
                 <h:outputText value="Client Email"/>
-                <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>     
+                <h:inputText id="clientEmail" value="#{client.email}"></h:inputText>
+                <h:commandButton value="Usuń" action="#{myClient.delete(client)}">
+                    <f:ajax execute="@form" render="clientForm" />
+                </h:commandButton> <br></br><br></br>
             </c:forEach>
             <h:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true">
                 <f:ajax execute="@form" render="clientForm" /> 

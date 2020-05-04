@@ -18,11 +18,7 @@
                 <h:outputText value="Client Name"/>
                 <h:inputText id="clientName" value="#{client.name}"></h:inputText>
                 <h:outputText value="Client company name" />
-                <h:inputText id="clientCompany" value="#{client.companyName}"></h:inputText>
-                <h:outputText value="Website" />
-                <h:inputText id="clientWebsit" value="#{client.website}"></h:inputText>
-                <h:outputText value="Client Email"/>
-                <h:inputText id="clientEmail" value="#{client.clientEmail}"></h:inputText> <br></br><br></br>          
+                <br></br><br></br>          
             </c:forEach>
             <h:commandButton value="Add client" action="#{registration.addClients()}" immediate="true">
                 <f:ajax execute="@form" render="clientsForm" /> 
@@ -30,6 +26,7 @@
             <h:commandButton id="saveClients" value="Save clients" action="#{registration.saveClient}">
             </h:commandButton><br></br>
             <h:messages for="saveClients"/>
+            <h:commandButton action="skip" value="Pomiń" style="margin: 15px auto; width: 35%; "></h:commandButton>
         </h:form>
     </h:body>
 </html>

@@ -7,9 +7,14 @@
         <view id="registration">
             <vdl-document>/registration/registration.xhtml</vdl-document>
         </view>
-        <flow-return id="Cancel">
+        <flow-return id="cancel">
             <from-outcome>
                 /index
+            </from-outcome>
+        </flow-return>
+        <flow-return id="skip"> 
+            <from-outcome>
+                /protected/mainPage.xhtml
             </from-outcome>
         </flow-return>
     </flow-definition>

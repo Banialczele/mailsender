@@ -39,8 +39,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName")
     , @NamedQuery(name = "User.findByUserMail", query = "SELECT u FROM User u WHERE u.userMail = :userMail")
     , @NamedQuery(name = "User.findByUserRole", query = "SELECT u FROM User u WHERE u.userRole = :userRole")
-    , @NamedQuery(name = "User.findByUserMailAndPassword", query = "SELECT u FROM User u WHERE u.userMail = :userMail AND u.password = :password")
-    , @NamedQuery(name = "User.findByLoginCredentials", query = "SELECT u FROM User u WHERE u.username = :username AND u.userMail = :userMail")})
+    , @NamedQuery(name = "User.findByUsernameEmail", query = "SELECT u FROM User u WHERE u.username = :username AND u.userMail = :userMail")
+    , @NamedQuery(name = "User.findByLoginCredentials", query = "SELECT u FROM User u WHERE u.userMail = :userMail AND u.password = :password")})
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,29 +50,31 @@ public class User implements Serializable {
     @Column(name = "idUser")
     private Integer idUser;
     @Basic(optional = false)
-    @Column(name = "Username", nullable=false)
+    @Column(name = "username")
     private String username;
     @Basic(optional = false)
-    @Column(name = "Password", nullable=false)
+    @Column(name = "password")
     private String password;
     @Basic(optional = false)
-    @Column(name = "FirstName", nullable=false)
+    @Column(name = "firstName")
     private String firstName;
     @Basic(optional = false)
-    @Column(name = "LastName", nullable=false)
+    @Column(name = "lastName")
     private String lastName;
     @Basic(optional = false)
-    @Column(name = "UserMail", nullable=false)
+    @Column(name = "userMail")
     private String userMail;
     @Basic(optional = false)
-    @Column(name = "userRole", nullable=false)
+    @Column(name = "userRole")
     private String userRole;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private Collection<Mailaccount> mailaccountCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private Collection<Etiquette> eitquetteCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
     private Collection<Client> clientCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
-    private Collection<Mailaccounts> mailaccountsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
-    private Collection<Sentmessage> sentmessageCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private Collection<Message> messageCollection;
 
     public User() {
     }
@@ -148,6 +150,24 @@ public class User implements Serializable {
     }
 
     @XmlTransient
+    public Collection<Mailaccount> getMailaccountCollection() {
+        return mailaccountCollection;
+    }
+
+    public void setMailaccountCollection(Collection<Mailaccount> mailaccountCollection) {
+        this.mailaccountCollection = mailaccountCollection;
+    }
+
+    @XmlTransient
+    public Collection<Etiquette> getEitquetteCollection() {
+        return eitquetteCollection;
+    }
+
+    public void setEitquetteCollection(Collection<Etiquette> eitquetteCollection) {
+        this.eitquetteCollection = eitquetteCollection;
+    }
+
+    @XmlTransient
     public Collection<Client> getClientCollection() {
         return clientCollection;
     }
@@ -157,21 +177,12 @@ public class User implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Mailaccounts> getMailaccountsCollection() {
-        return mailaccountsCollection;
+    public Collection<Message> getMessageCollection() {
+        return messageCollection;
     }
 
-    public void setMailaccountsCollection(Collection<Mailaccounts> mailaccountsCollection) {
-        this.mailaccountsCollection = mailaccountsCollection;
-    }
-
-    @XmlTransient
-    public Collection<Sentmessage> getSentmessageCollection() {
-        return sentmessageCollection;
-    }
-
-    public void setSentmessageCollection(Collection<Sentmessage> sentmessageCollection) {
-        this.sentmessageCollection = sentmessageCollection;
+    public void setMessageCollection(Collection<Message> messageCollection) {
+        this.messageCollection = messageCollection;
     }
 
     @Override

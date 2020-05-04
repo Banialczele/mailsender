@@ -5,7 +5,7 @@
       >
     <h:head>
         <title>Registration form</title>
-        <link rel="stylesheet" type="text/css" href="../styles/registrationFlow.css"/>
+        <h:outputStylesheet name="../styles/registrationFlow.css"/>
     </h:head>
     <h:body>
         <p>
@@ -30,7 +30,8 @@
                     <h:outputText value="Email "/>
                     <h:inputText id="email" value="#{registration.email}"></h:inputText>
                     <h:commandButton id="register" action="#{registration.register}" value="Zarejestruj" style="margin: 15px auto; width: 35%; "></h:commandButton>
-                    <h:commandButton action="Cancel" value="Anuluj" style="margin: 15px auto; width: 35%; "></h:commandButton>
+                    <h:commandButton action="cancel" value="Anuluj" style="margin: 15px auto; width: 35%; "></h:commandButton>
+                    
                     <h:messages for="register"/>
                 </h:form>
             </div> 

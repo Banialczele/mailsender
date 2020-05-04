@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -34,13 +36,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Client.findAll", query = "SELECT c FROM Client c")
     , @NamedQuery(name = "Client.findByIdClient", query = "SELECT c FROM Client c WHERE c.idClient = :idClient")
     , @NamedQuery(name = "Client.findByName", query = "SELECT c FROM Client c WHERE c.name = :name")
-    , @NamedQuery(name = "Client.findByCompanyName", query = "SELECT c FROM Client c WHERE c.companyName = :companyName")
-    , @NamedQuery(name = "Client.findByWebsite", query = "SELECT c FROM Client c WHERE c.website = :website")
-    , @NamedQuery(name = "Client.findByClientEmail", query = "SELECT c FROM Client c WHERE c.clientEmail = :clientEmail")
-    , @NamedQuery(name = "Client.findAllByUserId", query = "SELECT c FROM Client c WHERE c.userid = :userid")
-    , @NamedQuery(name = "Client.findEmailsByUserId", query = "SELECT c.clientEmail FROM Client c WHERE c.userid = :userid")
-
-})
+    , @NamedQuery(name = "Client.findByEmail", query = "SELECT c FROM Client c WHERE c.email = :email")})
 public class Client implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,22 +46,22 @@ public class Client implements Serializable {
     @Column(name = "idClient")
     private Integer idClient;
     @Basic(optional = false)
-    @Column(name = "Name", nullable = false)
+    @Column(name = "name")
     private String name;
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
-    @Column(name = "CompanyName", nullable = false)
-    private String companyName;
-    @Basic(optional = false)
-    @Column(name = "Website", nullable = false)
-    private String website;
-    @Basic(optional = false)
-    @Column(name = "clientEmail", nullable = false)
-    private String clientEmail;
-    @JoinColumn(name = "User_id", referencedColumnName = "idUser")
+    @Column(name = "email")
+    private String email;
+    @JoinTable(name = "client_has_etiquette", joinColumns = {
+        @JoinColumn(name = "idClient", referencedColumnName = "idClient")}, inverseJoinColumns = {
+        @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")})
+    @ManyToMany
+    private Collection<Etiquette> etiquetteCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idClient")
+    private Collection<Mailstatus> mailstatusCollection;
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
-    private User userid;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientid")
-    private Collection<Mailaccounts> mailaccountsCollection;
+    private User idUser;
 
     public Client() {
     }
@@ -74,12 +70,10 @@ public class Client implements Serializable {
         this.idClient = idClient;
     }
 
-    public Client(Integer idClient, String name, String companyName, String website, String clientEmail) {
+    public Client(Integer idClient, String name, String email) {
         this.idClient = idClient;
         this.name = name;
-        this.companyName = companyName;
-        this.website = website;
-        this.clientEmail = clientEmail;
+        this.email = email;
     }
 
     public Integer getIdClient() {
@@ -98,45 +92,38 @@ public class Client implements Serializable {
         this.name = name;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public String getClientEmail() {
-        return clientEmail;
-    }
-
-    public void setClientEmail(String clientEmail) {
-        this.clientEmail = clientEmail;
-    }
-
-    public User getUserid() {
-        return userid;
-    }
-
-    public void setUserid(User userid) {
-        this.userid = userid;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @XmlTransient
-    public Collection<Mailaccounts> getMailaccountsCollection() {
-        return mailaccountsCollection;
+    public Collection<Etiquette> getEtiquetteCollection() {
+        return etiquetteCollection;
     }
 
-    public void setMailaccountsCollection(Collection<Mailaccounts> mailaccountsCollection) {
-        this.mailaccountsCollection = mailaccountsCollection;
+    public void setEtiquetteCollection(Collection<Etiquette> eitquetteCollection) {
+        this.etiquetteCollection = eitquetteCollection;
+    }
+
+    @XmlTransient
+    public Collection<Mailstatus> getMailstatusCollection() {
+        return mailstatusCollection;
+    }
+
+    public void setMailstatusCollection(Collection<Mailstatus> mailstatusCollection) {
+        this.mailstatusCollection = mailstatusCollection;
+    }
+
+    public User getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(User idUser) {
+        this.idUser = idUser;
     }
 
     @Override
