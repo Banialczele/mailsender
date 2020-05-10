@@ -28,5 +28,5 @@ public class MailstatusFacade extends AbstractFacade<Mailstatus> {
     public MailstatusFacade() {
         super(Mailstatus.class);
     }
-    
+        
 }

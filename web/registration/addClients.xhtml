@@ -26,7 +26,7 @@
             <h:commandButton id="saveClients" value="Save clients" action="#{registration.saveClient}">
             </h:commandButton><br></br>
             <h:messages for="saveClients"/>
-            <h:commandButton action="skip" value="Pomiń" style="margin: 15px auto; width: 35%; "></h:commandButton>
+            <h:commandButton  id="skip" action="#{registration.skipAddClient()}" value="Pomiń" style="margin: 15px auto; width: 35%; "></h:commandButton>
         </h:form>
     </h:body>
 </html>

@@ -5,8 +5,10 @@
  */
 package com.pachole.serviceDAO;
 
+import com.pachole.entities.Client;
 import com.pachole.entities.Etiquette;
 import com.pachole.entities.User;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -36,10 +38,27 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         getEntityManager().persist(etiquette);
     }
 
-    public Etiquette checkExistance(String etiquetteName) {
+    @Override
+    public void remove(Etiquette etiquette) {
+        getEntityManager().remove(getEntityManager().merge(etiquette));
+    }
+
+    public Etiquette checkExistance(String name) {
         Etiquette result;
         try {
-            result = getEntityManager().createNamedQuery("Etiquette.findByName", Etiquette.class).setParameter("name", etiquetteName).getSingleResult();
+            result = getEntityManager().createNamedQuery("Etiquette.findByName", Etiquette.class).setParameter("name", name).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
+
+    public List<Etiquette> findByEtiquetteName(List<String> name) {
+        List<Etiquette> result = new ArrayList<Etiquette>();
+        try {
+            for (int i = 0; i < name.size(); i++) {
+                result.addAll(getEntityManager().createNamedQuery("Etiquette.findByName", Etiquette.class).setParameter("name", name.get(i)).getResultList());
+            }
         } catch (Exception e) {
             return null;
         }
@@ -55,4 +74,14 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         }
         return result;
     }
+
+    public void updateEtiquetteMailCollection(Etiquette etiquette) {
+        Etiquette result = null;
+        try {
+            result = getEntityManager().merge(etiquette);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
 }

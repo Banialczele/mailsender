@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Etiquette.findByName", query = "SELECT e FROM Etiquette e WHERE e.name = :name")
     , @NamedQuery(name = "Etiquette.findByArchive", query = "SELECT e FROM Etiquette e WHERE e.archive = :archive")
     , @NamedQuery(name = "Etiquette.findAllByUserId", query = "SELECT e FROM Etiquette e WHERE e.idUser = :idUser")
+    , @NamedQuery(name = "Etiquette.findAllNamesByUser", query = "SELECT e.name FROM Etiquette e WHERE e.idUser = :idUser")
 })
 public class Etiquette implements Serializable {
 
@@ -48,16 +49,16 @@ public class Etiquette implements Serializable {
     @Column(name = "idGroup")
     private Integer idGroup;
     @Basic(optional = false)
-    @Column(name = "name") 
-   private String name;
+    @Column(name = "name")
+    private String name;
     @Basic(optional = false)
     @Column(name = "archive")
     private String archive;
-    @JoinTable(name = "message_has_etiquette", joinColumns = {
+    @JoinTable(name = "mail_has_etiquette", joinColumns = {
         @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")}, inverseJoinColumns = {
-        @JoinColumn(name = "idMessage", referencedColumnName = "idMessage")})
+        @JoinColumn(name = "idMail", referencedColumnName = "idMail")})
     @ManyToMany
-    private Collection<Message> messageCollection = new ArrayList<>();
+    private Collection<Mail> mailCollection;
     @ManyToMany(mappedBy = "etiquetteCollection", cascade = CascadeType.PERSIST)
     private Collection<Client> clientCollection = new ArrayList<>();
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
@@ -102,12 +103,12 @@ public class Etiquette implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Message> getMessageCollection() {
-        return messageCollection;
+    public Collection<Mail> getMailCollection() {
+        return mailCollection;
     }
 
-    public void setMessageCollection(Collection<Message> messageCollection) {
-        this.messageCollection = messageCollection;
+    public void setMailCollection(Collection<Mail> mailCollection) {
+        this.mailCollection = mailCollection;
     }
 
     @XmlTransient

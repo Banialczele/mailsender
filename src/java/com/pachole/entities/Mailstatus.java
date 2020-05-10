@@ -54,9 +54,9 @@ public class Mailstatus implements Serializable {
     @JoinColumn(name = "idMailAccounts", referencedColumnName = "idMailAccounts")
     @ManyToOne(optional = false)
     private Mailaccount idMailAccounts;
-    @JoinColumn(name = "idMessage", referencedColumnName = "idMessage")
+    @JoinColumn(name = "idMail", referencedColumnName = "idMail")
     @ManyToOne(optional = false)
-    private Message idMessage;
+    private Mail idMail;
 
     public Mailstatus() {
     }
@@ -120,12 +120,12 @@ public class Mailstatus implements Serializable {
         this.idMailAccounts = idMailAccounts;
     }
 
-    public Message getIdMessage() {
-        return idMessage;
+    public Mail getIdMail() {
+        return idMail;
     }
 
-    public void setIdMessage(Message idMessage) {
-        this.idMessage = idMessage;
+    public void setIdMail(Mail idMail) {
+        this.idMail = idMail;
     }
 
     @Override

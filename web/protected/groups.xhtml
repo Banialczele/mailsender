@@ -4,46 +4,53 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      >
+
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Mail Sender App</title>
-        <h:outputStylesheet name="../styles/navStyle.css" />
-        <h:outputStylesheet name="../styles/recipients.css"/>
+        <h:outputStylesheet name="css/navStyle.css" />
+        <h:outputStylesheet name="css/recipients.css"/>
     </h:head>
     <h:body>
         <h1>Lista odbiorców</h1>
-        <nav>
-            <ul>
-                <li><a href="mainPage.xhtml">Strona główna</a></li>
-                <li><a href="groups.xhtml">Lista odbiorców</a></li>
-                <li><a href="sentMessages.xhtml">Wysłane</a></li>
-                <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
-            </ul>
-        </nav>
+        <h:form>
+            <p:menubar styleClass="horizontalmenu" style="margin: 20px auto; width: 70vw;">
+                <p:menuitem value="Strona główna" url="/MailSenderAPP/protected/mainPage.xhtml"/>
+                <p:menuitem value="Status wiadomości" url="/MailSenderAPP/protected/statusMessages.xhtml"/>
+                <p:menuitem value="Dodaj odbiorców" url="/MailSenderAPP/protected/manageClients.xhtml"/>
+            </p:menubar>
+        </h:form>
         <div class="recipientsContainer" id="recipientsContainer">
-            <div class="recipientsNames">
-                <div>Imie</div>
-                <div>Nazwa firmy</div>
-                <div>Strona</div>
-                <div>Email</div>
-                <div>Usuń</div>
-            </div>
-            <h:form class="recipientForm" id="recipientsForm">
-                <ui:repeat value="#{showClients.clientList}" var="client">
-                    <div class="recipients">
-                        <div class="recipientsData">
-                            <div id="name">#{client.name}</div>
-                            <div id="comapnyName">#{client.companyName}</div>
-                            <div id="website">#{client.website}</div>
-                            <div id="email">#{client.clientEmail}</div>
-                            <div>
-                                <h:commandButton value="Usuń" action="#{showClients.delete(client)}">
-                                    <f:ajax execute="@form" render="recipientsForm"/>
-                                </h:commandButton>
-                            </div>
-                        </div>
-                    </div>
+            <h:form id="groupForm">
+                <ui:repeat value="#{showClients.etiquetteList}" var="etiquette">
+
+                    <p:panel id="horizontal" header="#{etiquette.name}" toggleSpeed="100" toggleable="true" toggleOrientation="vertical" collapsed="true" >  
+                        <p:ajax event="toggle" listener="#{showClients.showClientsForEtiquette(etiquette.name)}" update="clientData"/>
+                        <p:ajax event="close" listener="#{showClients.clearEverything()}"/>
+                        <p:panelGrid columns="3" layout="grid" styleClass="showcase-text-align-center" >
+                            <h:outputText value="Nazwa klienta"/>
+                            <h:outputText value="Email klienta"/>
+                            <h:outputText value="Pokaż szczegóły"/>
+                        </p:panelGrid>
+                        <p:panelGrid id="clientData" styleClass="showcase-text-align-center">
+                            <ui:repeat value="#{showClients.clientList}" var="client">
+                                <p:panelGrid columns="3" layout="grid" styleClass="showcase-text-align-center" >
+                                    <h:outputText value="#{client.name}"/>
+                                    <h:outputText value="#{client.email}"/>
+                                    <p:commandButton value="Szczegóły" type="button" onclick="PF('clientDetails').show();" >
+                                        <f:param name="client" value="client"/>
+                                    </p:commandButton>
+                                </p:panelGrid>
+                            </ui:repeat>
+                        </p:panelGrid>
+
+                    </p:panel>   
+                    <p:commandButton action="#{showClients.deleteEtiquette(etiquette)}" value="Usuń etykiete #{etiquette.name}" ajax="true" update="groupForm" >
+                    </p:commandButton>
                 </ui:repeat>
+                <p:dialog header="Informacje o kliencie" widgetVar="clientDetails" minHeight="40">
+                    <h:outputText value="#{client.email}" />
+                </p:dialog>
             </h:form>
         </div>
 

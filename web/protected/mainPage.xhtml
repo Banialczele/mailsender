@@ -1,37 +1,37 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
-        <h:outputStylesheet name="css/mainPage.css" />
+        <h:outputStylesheet name="css/mainPage.css" />   
     </h:head>
     <h:body>
         <h1>Send email to users</h1>
-        <nav>
-            <ul>
-                <li><a href="groups.xhtml">Lista etykiet</a></li>
-                <li><a href="sentMessages.xhtml">Wysłane</a></li>
-                <li><a href="manageClients.xhtml">Dodaj odbiorców</a></li>
-                <li><a href="addGroup.xhtml">Dodaj etykiete</a></li>
-            </ul>
-        </nav>
+        <h:form>
+            <p:menubar styleClass="horizontalmenu" style="margin: 20px auto; width: 70vw;">
+                <p:menuitem value="Lista etykiet" url="/MailSenderAPP/protected/groups.xhtml"/>
+                <p:menuitem value="Status wiadomości" url="/MailSenderAPP/protected/statusMessages.xhtml"/>
+                <p:menuitem value="Dodaj odbiorców" url="/MailSenderAPP/protected/manageClients.xhtml"/>
+            </p:menubar>
+        </h:form>
         <div class="senderContainer">
             <h:form id="mailSenderForm">
-                <h:outputText value="Tytuł"/>
-                <h:inputText value="#{mailSend.topic}"></h:inputText>
-                <br></br>
-                <h:outputText value="Grupa odbiorców"/>
-                <h:inputText value="#{mailSend.subject}"></h:inputText>
-                <h:commandButton value="Wybierz odbiorców" action="#{mailSend.etiquetteList}"/>
-                <br></br>           
-                <h:outputText value="Wiadomość"></h:outputText>
-                <br></br>
-                <h:inputTextarea value="#{mailSend.content}"/>
-                <br></br>
-                <h:commandButton value="Wyślij wiadomość" action="#{mailSend.sendMessage()}"/>
-                <h:commandButton action="#{logout.logout()}" value="wyloguj"></h:commandButton>
+                <div class="ui-fluid">
+                    <h:panelGrid style="margin: 0 auto;" styleClass="ui-panelgrid-blank ui-fluid">
+                        <p:outputLabel value="Tytuł"/>
+                        <p:inputText value="#{mailSend.topic}"></p:inputText>
+                        <p:growl id="msgs" showDetail="true" />
+                        <p:outputLabel id="etiquetteLabel" value="Wybierz etykiety: " />    
+                        <p:autoComplete id="etiquetteList" maxResults="7" value="#{mailSend.etiquetteName}" completeMethod="#{mailSend.showNamesList}" multiple="true" />           
+                        <p:outputLabel value="Wiadomość" />
+                        <p:inputTextarea value="#{mailSend.content}" />
+                        <p:commandButton value="Wyślij wiadomość" action="#{mailSend.sendMessage()}"/>
+                        <p:commandButton action="#{logout.logout()}" value="wyloguj"/>
+                    </h:panelGrid>
+                </div>
             </h:form>
         </div>
     </h:body>

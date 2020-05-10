@@ -74,7 +74,7 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
     private Collection<Client> clientCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
-    private Collection<Message> messageCollection;
+    private Collection<Mail> mailCollection;
 
     public User() {
     }
@@ -177,12 +177,12 @@ public class User implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Message> getMessageCollection() {
-        return messageCollection;
+    public Collection<Mail> getMailCollection() {
+        return mailCollection;
     }
 
-    public void setMessageCollection(Collection<Message> messageCollection) {
-        this.messageCollection = messageCollection;
+    public void setMessageCollection(Collection<Mail> mailCollection) {
+        this.mailCollection = mailCollection;
     }
 
     @Override

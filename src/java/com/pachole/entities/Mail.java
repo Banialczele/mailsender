@@ -6,6 +6,7 @@
 package com.pachole.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -22,8 +23,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -32,22 +31,22 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author marci
  */
 @Entity
-@Table(name = "message")
+@Table(name = "mail")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Message.findAll", query = "SELECT m FROM Message m")
-    , @NamedQuery(name = "Message.findByIdMessage", query = "SELECT m FROM Message m WHERE m.idMessage = :idMessage")
-    , @NamedQuery(name = "Message.findByMessageTopic", query = "SELECT m FROM Message m WHERE m.messageTopic = :messageTopic")
-    , @NamedQuery(name = "Message.findByDate", query = "SELECT m FROM Message m WHERE m.date = :date")
-    , @NamedQuery(name = "Message.findByAuthorName", query = "SELECT m FROM Message m WHERE m.authorName = :authorName")})
-public class Message implements Serializable {
+    @NamedQuery(name = "Message.findAll", query = "SELECT m FROM Mail m")
+    , @NamedQuery(name = "Message.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail")
+    , @NamedQuery(name = "Message.findByMessageTopic", query = "SELECT m FROM Mail m WHERE m.messageTopic = :messageTopic")
+    , @NamedQuery(name = "Message.findByDate", query = "SELECT m FROM Mail m WHERE m.date = :date")
+    , @NamedQuery(name = "Message.findByAuthorName", query = "SELECT m FROM Mail m WHERE m.authorName = :authorName")})
+public class Mail implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "idMessage")
-    private Integer idMessage;
+    @Column(name = "idMail")
+    private Integer idMail;
     @Basic(optional = false)
     @Lob
     @Column(name = "receiver")
@@ -65,23 +64,23 @@ public class Message implements Serializable {
     @Basic(optional = false)
     @Column(name = "authorName")
     private String authorName;
-    @ManyToMany(mappedBy = "messageCollection")
+    @ManyToMany(mappedBy = "mailCollection")
     private Collection<Etiquette> etiquetteCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMessage")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMail")
     private Collection<Mailstatus> mailstatusCollection;
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
     private User idUser;
 
-    public Message() {
+    public Mail() {
     }
 
-    public Message(Integer idMessage) {
-        this.idMessage = idMessage;
+    public Mail(Integer idMail) {
+        this.idMail = idMail;
     }
 
-    public Message(Integer idMessage, String receiver, String messageContent, String messageTopic, String date, String authorName) {
-        this.idMessage = idMessage;
+    public Mail(Integer idMail, String receiver, String messageContent, String messageTopic, String date, String authorName) {
+        this.idMail = idMail;
         this.receiver = receiver;
         this.messageContent = messageContent;
         this.messageTopic = messageTopic;
@@ -89,12 +88,12 @@ public class Message implements Serializable {
         this.authorName = authorName;
     }
 
-    public Integer getIdMessage() {
-        return idMessage;
+    public Integer getIdMail() {
+        return idMail;
     }
 
-    public void setIdMessage(Integer idMessage) {
-        this.idMessage = idMessage;
+    public void setIdMail(Integer idMail) {
+        this.idMail = idMail;
     }
 
     public String getReceiver() {
@@ -166,18 +165,18 @@ public class Message implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idMessage != null ? idMessage.hashCode() : 0);
+        hash += (idMail != null ? idMail.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Message)) {
+        if (!(object instanceof Mail)) {
             return false;
         }
-        Message other = (Message) object;
-        if ((this.idMessage == null && other.idMessage != null) || (this.idMessage != null && !this.idMessage.equals(other.idMessage))) {
+        Mail other = (Mail) object;
+        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
             return false;
         }
         return true;
@@ -185,7 +184,7 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return "com.pachole.entities.Message[ idMessage=" + idMessage + " ]";
+        return "com.pachole.entities.Message[ idMail=" + idMail + " ]";
     }
     
 }

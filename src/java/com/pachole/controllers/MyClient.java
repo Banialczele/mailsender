@@ -53,22 +53,10 @@ public class MyClient implements Serializable {
     }
 
     public void saveClient() {
-        if( etiquetteName == null && !"".equals(etiquetteNameFromInput)){
-            etiquetteName = etiquetteNameFromInput;
-        }
-        Etiquette label = etiquetteDAO.checkExistance(etiquetteName);
-        List<Etiquette> etiquettes = new ArrayList<>();
-        if (label == null) {
-            Etiquette newEtiquette = new Etiquette();
-            newEtiquette.setName(etiquetteName);
-            newEtiquette.setArchive("Siemaneczko");
-            newEtiquette.setIdUser(loggedUser);
-            try {
-                etiquetteDAO.create(newEtiquette);
-                etiquettes.add(newEtiquette);
-            } catch (Exception e) {
-                throw new Error(e);
-            }
+        List<Etiquette> etiquettes = new ArrayList<Etiquette>();        
+        if (etiquetteName != null) {
+            Etiquette foundLabel = etiquetteDAO.checkExistance(etiquetteName);
+            etiquettes.add(foundLabel);
             clientList.forEach((client) -> {
                 boolean email = validateEmail(client.getEmail());
                 if (email) {
@@ -84,16 +72,24 @@ public class MyClient implements Serializable {
                         ctx.addMessage("clientForm:saveClients", message);
                     } catch (Error e) {
                         throw new Error(e);
-                    }
+                    }   
                 } else if (email != true) {
                     FacesContext ctx = FacesContext.getCurrentInstance();
                     FacesMessage message = new FacesMessage("Invalid email, please check email and try again." + client.getEmail());
                     ctx.addMessage("clientForm:clientEmail", message);
                 }
             });
-
         } else {
-            etiquettes.add(label);
+            Etiquette newEtiquette = new Etiquette();
+            newEtiquette.setName(etiquetteNameFromInput);
+            newEtiquette.setArchive("Siemaneczko");
+            newEtiquette.setIdUser(loggedUser);
+            try {
+                etiquetteDAO.create(newEtiquette);
+                etiquettes.add(newEtiquette);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
             clientList.forEach((client) -> {
                 boolean email = validateEmail(client.getEmail());
                 if (email) {
@@ -170,6 +166,6 @@ public class MyClient implements Serializable {
     public void setEtiquetteNameFromInput(String etiquetteNameFromInput) {
         this.etiquetteNameFromInput = etiquetteNameFromInput;
     }
-    
-    
+
 }
+    

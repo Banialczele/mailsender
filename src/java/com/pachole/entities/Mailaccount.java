@@ -6,9 +6,7 @@
 package com.pachole.entities;
 
 import java.io.Serializable;
-import java.util.Collection;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,12 +16,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -36,7 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Mailaccount.findAll", query = "SELECT m FROM Mailaccount m")
     , @NamedQuery(name = "Mailaccount.findByIdMailAccounts", query = "SELECT m FROM Mailaccount m WHERE m.idMailAccounts = :idMailAccounts")
     , @NamedQuery(name = "Mailaccount.findByMailAddress", query = "SELECT m FROM Mailaccount m WHERE m.mailAddress = :mailAddress")
-    , @NamedQuery(name = "Mailaccount.findByDailyLimit", query = "SELECT m FROM Mailaccount m WHERE m.dailyLimit = :dailyLimit")})
+    , @NamedQuery(name = "Mailaccount.findByDailyLimit", query = "SELECT m FROM Mailaccount m WHERE m.dailyLimit = :dailyLimit")
+    , @NamedQuery(name = "Mailaccount.findByPassword", query = "SELECT m FROM Mailaccount m WHERE m.password = :password")})
 public class Mailaccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,11 +48,11 @@ public class Mailaccount implements Serializable {
     @Basic(optional = false)
     @Column(name = "dailyLimit")
     private int dailyLimit;
+    @Column(name = "password")
+    private String password;
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
     private User idUser;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMailAccounts")
-    private Collection<Mailstatus> mailstatusCollection;
 
     public Mailaccount() {
     }
@@ -94,21 +91,20 @@ public class Mailaccount implements Serializable {
         this.dailyLimit = dailyLimit;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public User getIdUser() {
         return idUser;
     }
 
     public void setIdUser(User idUser) {
         this.idUser = idUser;
-    }
-
-    @XmlTransient
-    public Collection<Mailstatus> getMailstatusCollection() {
-        return mailstatusCollection;
-    }
-
-    public void setMailstatusCollection(Collection<Mailstatus> mailstatusCollection) {
-        this.mailstatusCollection = mailstatusCollection;
     }
 
     @Override

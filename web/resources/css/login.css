@@ -20,12 +20,5 @@ h2 {
     padding: 50px 0;
     width: 30%;
     background: rgb(0,145,255);
-}
-
-div .loginForm {
-    width: 50%;    
-    margin: 10px auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;   
+    border-radius: 15px;
 }

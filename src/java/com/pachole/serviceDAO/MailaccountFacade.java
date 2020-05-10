@@ -6,6 +6,7 @@
 package com.pachole.serviceDAO;
 
 import com.pachole.entities.Mailaccount;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,5 +29,14 @@ public class MailaccountFacade extends AbstractFacade<Mailaccount> {
     public MailaccountFacade() {
         super(Mailaccount.class);
     }
-    
+
+    public List<Mailaccount> getMailAccount() {
+        List<Mailaccount> result;
+        try {
+            result = getEntityManager().createNamedQuery("Mailaccount.findAll", Mailaccount.class).getResultList();
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        return result;
+    }
 }

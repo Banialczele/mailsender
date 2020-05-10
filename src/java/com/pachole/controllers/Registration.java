@@ -79,6 +79,10 @@ public class Registration implements Serializable {
     public void addClients() {
         clientsList.add(new Client());
     }
+    
+    public String skipAddClient() {
+        return "/protected/mainPage.xhtml?faces-redirect=true";
+    }
 
     public String saveClient() {
         clientsList.forEach((client) -> {
