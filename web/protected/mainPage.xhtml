@@ -2,38 +2,75 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
-        <h:outputStylesheet name="css/mainPage.css" />   
+        <h:outputStylesheet name="css/mainPage.css"/>
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
-        <h1>Send email to users</h1>
-        <h:form>
-            <p:menubar styleClass="horizontalmenu" style="margin: 20px auto; width: 70vw;">
-                <p:menuitem value="Lista etykiet" url="/MailSenderAPP/protected/groups.xhtml"/>
-                <p:menuitem value="Status wiadomości" url="/MailSenderAPP/protected/statusMessages.xhtml"/>
-                <p:menuitem value="Dodaj odbiorców" url="/MailSenderAPP/protected/manageClients.xhtml"/>
+        <h:form class="navbarform">
+            <p:menubar style="margin: 20px auto; width: 70vw;">
+                <p:submenu label="Etykiety" icon="pi pi-tag">
+                    <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                </p:submenu>
+                <p:submenu label="Wiadomości" icon="pi pi-envelope">
+                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
+                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
+                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                </p:submenu>
+                <p:submenu label="Klienci" icon="pi pi-user">
+                    <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
+                    <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                </p:submenu>
+                <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
-        <div class="senderContainer">
-            <h:form id="mailSenderForm">
-                <div class="ui-fluid">
-                    <h:panelGrid style="margin: 0 auto;" styleClass="ui-panelgrid-blank ui-fluid">
-                        <p:outputLabel value="Tytuł"/>
-                        <p:inputText value="#{mailSend.topic}"></p:inputText>
-                        <p:growl id="msgs" showDetail="true" />
-                        <p:outputLabel id="etiquetteLabel" value="Wybierz etykiety: " />    
-                        <p:autoComplete id="etiquetteList" maxResults="7" value="#{mailSend.etiquetteName}" completeMethod="#{mailSend.showNamesList}" multiple="true" />           
-                        <p:outputLabel value="Wiadomość" />
-                        <p:inputTextarea value="#{mailSend.content}" />
-                        <p:commandButton value="Wyślij wiadomość" action="#{mailSend.sendMessage()}"/>
-                        <p:commandButton action="#{logout.logout()}" value="wyloguj"/>
-                    </h:panelGrid>
-                </div>
-            </h:form>
-        </div>
+
+        <h:form id="groupsForm" style="width: 80%; margin: 0 auto;">
+            <p:dataTable value="#{mailMessages.messageList}" 
+                         var="message"
+                         paginator="true" 
+                         rows="5" 
+                         rowsPerPageTemplate="5,10,15,20,50"                                       
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records" widgetVar="messageList"
+                         style="width: 80%; margin: 0 auto;"
+                         id="messegeRecords"
+                         >
+                <f:facet name="header">                   
+                    Lista wiadomości
+                </f:facet>
+                <p:column id="column" headerText="Temat" sortBy="#{message.messageTopic}" filterable="true" filterMatchMode="contains" filterBy="#{message.messageTopic}">
+                    <p:panelGrid columns="3">
+                        <h:outputText value="#{message.messageTopic}"/>
+                        <p:commandButton value="Szczegóły" oncomplete="PF('details').show();" update=":dialog" ajax="true" >
+                            <f:setPropertyActionListener value="#{message}" target="#{mailMessages.selectedMail}" />  
+                        </p:commandButton>
+                        <p:commandButton value="Wyślij ponownie" action="#{mailSend.sendMessage(message)}"/>
+                    </p:panelGrid>                    
+                </p:column> 
+            </p:dataTable> 
+        </h:form>
+        <h:form id="dialog">            
+            <p:dialog id="myDialog" header="Wiadomość: #{mailMessages.selectedMail.messageTopic}" widgetVar="details">
+                <p:panelGrid columns="2">
+                    <h:outputText value="Temat wiadomości: "/>
+                    <h:outputText value="#{mailMessages.selectedMail.messageTopic}"/>
+
+                    <h:outputText value="Wiadomość: "/>
+                    <h:outputText value="#{mailMessages.selectedMail.messageContent}"/>
+
+                    <h:outputText value="Data wysłania: "/>
+                    <h:outputText value="#{mailMessages.selectedMail.date}" />
+                </p:panelGrid>
+            </p:dialog>
+        </h:form>
     </h:body>
 </html>
 

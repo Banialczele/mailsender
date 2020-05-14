@@ -6,6 +6,8 @@
 package com.pachole.serviceDAO;
 
 import com.pachole.entities.Mail;
+import com.pachole.entities.User;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,6 +38,16 @@ public class MailFacade extends AbstractFacade<Mail> {
         } catch (Exception e) {
             throw new Error(e);
         }
+    }
+    
+    public List<Mail> findByLoggedUser(User user){
+        List<Mail> result;
+        try{
+            result = getEntityManager().createNamedQuery("Message.findByLoggedUser", Mail.class).setParameter("idUser", user).getResultList();
+        } catch(Exception e){
+            throw new Error(e);
+        }
+        return result;
     }
 
 }

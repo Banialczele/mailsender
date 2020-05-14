@@ -6,17 +6,17 @@ import com.pachole.entities.User;
 import com.pachole.serviceDAO.ClientFacade;
 import com.pachole.serviceDAO.EtiquetteFacade;
 import com.pachole.utils.SessionUtil;
-import static com.pachole.utils.SessionUtil.getRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import org.primefaces.event.ToggleEvent;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
-import org.primefaces.component.ajaxstatus.AjaxStatus;
 
 @Named
 @ViewScoped
@@ -28,33 +28,31 @@ public class ShowClients implements Serializable {
     @Inject
     private EtiquetteFacade etiquetteDAO;
 
-    private List<Client> clientList;
+    private List<Client> clientList = new ArrayList<Client>();
     private List<Etiquette> etiquetteList;
+    private User loggedUser;
+    private Client showClientDetails;
 
     @PostConstruct
     public void init() {
         HttpSession session = SessionUtil.getSession();
-        User user = (User) session.getAttribute("user");
-        etiquetteList = etiquetteDAO.getAllEtiquettes(user);
+        loggedUser = (User) session.getAttribute("user");
+        etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
     }
-
-    public List<Client> showClientsForEtiquette(String etiquetteName) {
-        clientList = clientDAO.findClientsByEtiquetteName(etiquetteName);
-        return clientList;
-    }
-    
-    public void deleteEverything(){
-        clientList.clear();
-    }
-    
 
     public void deleteEtiquette(Etiquette etiquette) {
         etiquetteDAO.remove(etiquette);
     }
 
     public void delete(Client client) {
+        System.out.println(client);
         clientList.remove(client);
         clientDAO.remove(client);
+    }
+
+    public void onToggle(ToggleEvent event) {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, event.getComponent().getId() + " toggled", "Status:" + event.getVisibility().name());
+        FacesContext.getCurrentInstance().addMessage("groupsForm:msgs", message);
     }
 
     public List<Client> getClientList() {
@@ -71,6 +69,14 @@ public class ShowClients implements Serializable {
 
     public void setEtiquetteList(List<Etiquette> etiquetteList) {
         this.etiquetteList = etiquetteList;
+    }
+
+    public Client getShowClientDetails() {
+        return showClientDetails;
+    }
+
+    public void setShowClientDetails(Client showClientDetails) {
+        this.showClientDetails = showClientDetails;
     }
 
 }

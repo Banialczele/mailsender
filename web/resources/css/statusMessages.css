@@ -1,15 +1,12 @@
-body {    
+body {
     height: 100%;
     width: 100%;
-    background: rgb(35,35,35);
+    background: rgb(15,15,15);
     font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
-
-.groupTable {
-    border-radius: 5px;
+    border: 1px solid red;
 }
 

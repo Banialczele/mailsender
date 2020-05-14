@@ -9,43 +9,62 @@
     <h:head>
         <title>Mail Sender App</title>        
         <h:outputStylesheet name="css/navStyle.css" />
+        <h:outputStylesheet name="css/manageClients.css" />
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
-        <h1>Add clients</h1>
-        <h:form>
-            <p:menubar styleClass="horizontalmenu" style="margin: 20px auto; width: 70vw;">
-                <p:menuitem value="Strona główna" url="/MailSenderAPP/protected/mainPage.xhtml"/>
-                <p:menuitem value="Lista etykiet" url="/MailSenderAPP/protected/groups.xhtml"/>
-                <p:menuitem value="Status wiadomości" url="/MailSenderAPP/protected/statusMessages.xhtml"/>
+        <h:form class="navbarform">
+            <p:menubar style="margin: 20px auto; width: 70vw;">
+                <p:submenu label="Etykiety" icon="pi pi-tag">
+                    <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                </p:submenu>
+                <p:submenu label="Wiadomości" icon="pi pi-envelope">
+                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
+                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
+                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                </p:submenu>
+                <p:submenu label="Klienci" icon="pi pi-user">
+                    <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
+                    <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                </p:submenu>
+                <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
 
-        <h:form id="clientForm">
-            <h:outputText value="Choose etiquette"/>
-            <h:selectOneMenu value="#{myClient.etiquetteName}">
-                <f:selectItem itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
-                <f:selectItems value="#{myClient.existingEtiquettes}" var="etiquette" itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
-            </h:selectOneMenu>
+        <div class="clientContainer" >
+            <h:form id="clientForm" style="margin: 0 auto;">
+                <p:panelGrid columns="2" layout="grid" style="margin: 10px auto; width: 50vw; padding: 20px 0;">
+                    <p:outputLabel value="Wybierz etykiete: "/>
+                    <p:selectOneMenu value="#{myClient.etiquetteName}">
+                        <f:selectItem itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
+                        <f:selectItems value="#{myClient.existingEtiquettes}" var="etiquette" itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="Dodaj nową etykiete"/>
+                    <p:inputText id="etiquetteName" value="#{myClient.etiquetteNameFromInput}"></p:inputText>
+                </p:panelGrid>
+                <c:forEach items="#{myClient.clientList}" var="client">
+                    <p:panelGrid columns="5" style="display: block; text-align: center; margin: 5px auto;">
+                        <p:outputLabel value="Nazwa klienta: "/>
+                        <p:inputText id="clientName" value="#{client.name}"></p:inputText>
 
-            <h:outputText value="Add new etiquette"/>
-            <h:inputText id="etiquetteName" value="#{myClient.etiquetteNameFromInput}"></h:inputText>
-            <c:forEach items="#{myClient.clientList}" var="client">
-                <h:outputText value="Client Name"/>
-                <h:inputText id="clientName" value="#{client.name}"></h:inputText>
-
-                <h:outputText value="Client Email"/>
-                <h:inputText id="clientEmail" value="#{client.email}"></h:inputText>
-                <h:commandButton value="Usuń" action="#{myClient.delete(client)}">
-                    <f:ajax execute="@form" render="clientForm" />
-                </h:commandButton> <br></br><br></br>
-            </c:forEach>
-            <h:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true">
-                <f:ajax execute="@form" render="clientForm" /> 
-            </h:commandButton>
-            <h:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
-            </h:commandButton><br></br>
-            <h:messages for="saveClients"/>
-        </h:form>
+                        <p:outputLabel value="Adres email klienta"/>
+                        <p:inputText id="clientEmail" value="#{client.email}"></p:inputText>
+                        <p:commandButton value="Usuń" action="#{myClient.delete(client)}">
+                            <f:ajax execute="@form" render="clientForm" />
+                        </p:commandButton>
+                    </p:panelGrid>
+                </c:forEach>
+                <p:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true">
+                    <f:ajax execute="@form" render="clientForm" /> 
+                </p:commandButton>
+                <p:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
+                </p:commandButton><br></br>
+                <h:messages for="saveClients"/>
+            </h:form>
+        </div>
     </h:body>
 </html>
 

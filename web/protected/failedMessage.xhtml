@@ -2,22 +2,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
+        <h:outputStylesheet name="css/recipients.css"/>
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
         <h:form class="navbarform">
-           <p:menubar style="margin: 20px auto; width: 70vw;">
-               <p:submenu label="Etykiety" icon="pi pi-tag">
+            <p:menubar style="margin: 20px auto; width: 70vw;">
+                <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
                     <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
                 </p:submenu>
-               <p:submenu label="Wiadomości" icon="pi pi-envelope">
+                <p:submenu label="Wiadomości" icon="pi pi-envelope">
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
@@ -32,14 +33,24 @@
             </p:menubar>
         </h:form>
 
-        <h:form style="width: 85%; margin: 0 auto;">
-            
-            <p:panel toggleable="true" header="Wiadomości oczekujące na wysłanie" style="border: none;" collapsed="true">
-                
-            </p:panel>
-            <p:outputLabel rendered="#{empty messageStatus.errorList}" />
-            
-        </h:form>    
+        <h:form id="groupsForm" style="width: 60vw;">
+            <p:dataTable value="#{messageStatus.errorList}" var="e" lazy="true" 
+                         paginator="true" 
+                         rows="5" 
+                         rowsPerPageTemplate="5,10,15,20,50"                                         
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">    
+                <p:column headerText="Adres email">
+                    #{e.idClient.email}
+                </p:column>
+                <p:column headerText="Temat wiadomości">
+                    #{e.idMail.messageTopic}
+                </p:column>
+                <p:column headerText="Autor">
+                    #{e.idMail.authorName}
+                </p:column>
+            </p:dataTable>
+        </h:form>
     </h:body>
 </html>
 

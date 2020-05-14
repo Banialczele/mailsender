@@ -30,10 +30,10 @@ public class MailaccountFacade extends AbstractFacade<Mailaccount> {
         super(Mailaccount.class);
     }
 
-    public List<Mailaccount> getMailAccount() {
-        List<Mailaccount> result;
+    public Mailaccount getMailAccount() {
+        Mailaccount result;
         try {
-            result = getEntityManager().createNamedQuery("Mailaccount.findAll", Mailaccount.class).getResultList();
+            result = getEntityManager().createNamedQuery("Mailaccount.findAll", Mailaccount.class).getSingleResult();
         } catch (Exception e) {
             throw new Error(e);
         }

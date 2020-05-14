@@ -1,7 +1,22 @@
-.senderContainer {
-    padding: 30px;
-    background: rgb(220,220,220);
-    width: 70vw;
-    margin: 0 auto;
+body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background: rgb(35,35,35);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-size: 20px;
 }
 
+.ui-widget-content {
+    border: none;
+}
+
+.ui-panelgrid {
+    border: none;
+}
+
+.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+    border-style: none !important;
+}

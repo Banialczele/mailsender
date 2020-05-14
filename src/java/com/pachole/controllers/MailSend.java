@@ -13,16 +13,16 @@ import com.pachole.serviceDAO.MailaccountFacade;
 import com.pachole.serviceDAO.MailstatusFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import javax.inject.Named;
-import javax.mail.*;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Named;
+import javax.mail.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
@@ -44,8 +44,9 @@ public class MailSend implements Serializable {
     private List<String> etiquetteName = new ArrayList<String>();
     private List<Etiquette> etiquetteList = new ArrayList<Etiquette>();
     private List<Etiquette> etiquetteCollection = new ArrayList<Etiquette>();
-    private List<Client> clientEmails;
-    private List<Mailaccount> mailAccount;
+    private List<Client> clientData = new ArrayList<Client>();
+    private Mailaccount mailAccount;
+    private Mail selectedMail;
 
     @Inject
     private ClientFacade clientDAO;
@@ -54,32 +55,58 @@ public class MailSend implements Serializable {
     @Inject
     private MailFacade mailDAO;
     @Inject
-    private MailaccountFacade mailAccountDAO;
+    private MailaccountFacade accountDAO;
+    @Inject
+    private MailstatusFacade statusDAO;
 
     @PostConstruct
     public void init() {
         HttpSession session = SessionUtil.getSession();
         loggedUser = (User) session.getAttribute("user");
         etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
-        mailAccount = mailAccountDAO.getMailAccount();
+        mailAccount = accountDAO.getMailAccount();
+    }
+
+    public void useMail(Mail message) {
+        selectedMail = message;
     }
 
     public List<String> showNamesList(String query) {
         String queryToLowerCase = query.toLowerCase();
         List<String> allLabels = new ArrayList<String>();
-        for(Etiquette e : etiquetteList){
+        for (Etiquette e : etiquetteList) {
             allLabels.add(e.getName());
-        }      
-        
-        return allLabels.stream().filter( name -> name.toLowerCase().contains(queryToLowerCase)).collect(Collectors.toList()); 
+        }
+
+        return allLabels.stream().filter(name -> name.toLowerCase().contains(queryToLowerCase)).collect(Collectors.toList());
     }
 
-    public void sendMessage() throws MessagingException {
-        clientEmails = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
-        etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
-        String author = loggedUser.getFirstName() + " " + loggedUser.getLastName() + " " + loggedUser.getUserMail();
+    public void sendMessage(Mail selectedMessage) throws MessagingException {
+        if (selectedMessage == null) {
+            clientData = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
+            etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
 
+            String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
+            DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+            Date currentDay = new Date();
+        } else if (selectedMessage != null) {
+
+            topic = selectedMessage.getMessageTopic();
+            content = selectedMessage.getMessageContent();
+            for (Etiquette e : selectedMessage.getEtiquetteCollection()) {
+                etiquetteName.add(e.getName());
+            }
+
+            clientData = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
+            etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
+
+        }
+
+        String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        Date currentDay = new Date();
         Properties prop = new Properties();
+        
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
         prop.put("mail.smtp.auth", "true");
@@ -90,47 +117,60 @@ public class MailSend implements Serializable {
                 new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("banialczele@gmail.com", "dupa4ever");
+                return new PasswordAuthentication(mailAccount.getMailAddress(), mailAccount.getPassword());
             }
         });
         System.out.println("Trying to send an email");
 
         Mail emailMessage;
-        Mailstatus emailStatus;
-        for (int i = 0; i < clientEmails.size(); ++i) {
+        Mailstatus emailStatus = new Mailstatus();
+        for (Client client : clientData) {
             try {
-                receiver = String.valueOf(clientEmails.get(i));
+                receiver = client.getEmail();
                 emailMessage = new Mail();
-                emailStatus = new Mailstatus();
-                
-                emailMessage.setReceiver(receiver);
-                emailMessage.setMessageContent(content);
-                emailMessage.setMessageTopic(topic);
-                emailMessage.setDate("07/05/2020");
+
+                emailMessage.setReceiver(receiver.trim());
+                emailMessage.setMessageContent(content.trim());
+                emailMessage.setMessageTopic(topic.trim());
+                emailMessage.setDate(df.format(currentDay));
                 emailMessage.setAuthorName(author);
                 emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
                 emailMessage.setIdUser(loggedUser);
-               
-                for (Etiquette e : etiquetteCollection) {
-                    emailMessage.getEtiquetteCollection().add(e);
-                }
+                emailMessage.getEtiquetteCollection().addAll(etiquetteCollection);
+
                 try {
-                    for( Etiquette e : etiquetteCollection ){
+                    for (Etiquette e : etiquetteCollection) {
+                        mailDAO.create(emailMessage);
                         e.getMailCollection().add(emailMessage);
-                        
                         etiquetteDAO.updateEtiquetteMailCollection(e);
+
+                        emailStatus.setDate(df.format(currentDay));
+                        emailStatus.setMailStatus("Oczekuje na wysłanie");
+                        emailStatus.setStatus("Oczekuje na wysłanie");
+                        emailStatus.setIdClient(client);
+                        emailStatus.setIdMail(emailMessage);
+                        emailStatus.setIdMailAccounts(mailAccount);
+                        statusDAO.create(emailStatus);
                     }
                 } catch (Exception e) {
                     throw new Error(e);
                 }
-                
+
                 Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress("banialczele@gmail.com"));
+                message.setFrom(new InternetAddress(mailAccount.getMailAddress()));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
                 message.setSubject(topic);
                 message.setText(content);
                 Transport.send(message);
-                
+
+                emailStatus.setDate(df.format(currentDay));
+                emailStatus.setMailStatus("Wysłano");
+                emailStatus.setStatus("Wysłano");
+                emailStatus.setIdClient(client);
+                emailStatus.setIdMail(emailMessage);
+                emailStatus.setIdMailAccounts(mailAccount);
+                statusDAO.update(emailStatus);
+
             } catch (AddressException ex) {
                 Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -185,4 +225,13 @@ public class MailSend implements Serializable {
     public void setEtiquetteName(List<String> etiquetteName) {
         this.etiquetteName = etiquetteName;
     }
+
+    public Mail getSelectedMail() {
+        return selectedMail;
+    }
+
+    public void setSelectedMail(Mail selectedMail) {
+        this.selectedMail = selectedMail;
+    }
+
 }

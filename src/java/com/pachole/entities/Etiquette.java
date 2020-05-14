@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -59,7 +60,7 @@ public class Etiquette implements Serializable {
         @JoinColumn(name = "idMail", referencedColumnName = "idMail")})
     @ManyToMany
     private Collection<Mail> mailCollection;
-    @ManyToMany(mappedBy = "etiquetteCollection", cascade = CascadeType.PERSIST)
+    @ManyToMany(mappedBy = "etiquetteCollection", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Collection<Client> clientCollection = new ArrayList<>();
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)

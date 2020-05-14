@@ -1,0 +1,10 @@
+.clientContainer {
+    padding: 30px;
+    background: rgb(220,220,220);
+    width: 70vw;
+    margin: 0 auto;
+}
+
+ui.panelgrid, .ui-panelgrid-cell {
+    border-style: none !important;
+}

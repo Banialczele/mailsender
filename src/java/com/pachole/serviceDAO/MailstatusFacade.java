@@ -6,6 +6,8 @@
 package com.pachole.serviceDAO;
 
 import com.pachole.entities.Mailstatus;
+import com.pachole.entities.User;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,5 +30,31 @@ public class MailstatusFacade extends AbstractFacade<Mailstatus> {
     public MailstatusFacade() {
         super(Mailstatus.class);
     }
-        
+
+    @Override
+    public void create(Mailstatus status) {
+        try {
+            getEntityManager().persist(status);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    public void update(Mailstatus status) {
+        try {
+            getEntityManager().merge(status);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    public List<Mailstatus> getMailAndClientEmail(User loggedUser) {
+        List<Mailstatus> result;
+        try {
+            result = getEntityManager().createQuery("SELECT s FROM Mailstatus s WHERE s.idMail IN ( SELECT m FROM Mail m WHERE m.idUser = :idUser ) ", Mailstatus.class).setParameter("idUser", loggedUser).getResultList();
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        return result;
+    }
 }

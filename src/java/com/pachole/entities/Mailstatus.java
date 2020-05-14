@@ -9,6 +9,9 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -28,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Mailstatus.findAll", query = "SELECT m FROM Mailstatus m")
-    , @NamedQuery(name = "Mailstatus.findByIdMessageHistory", query = "SELECT m FROM Mailstatus m WHERE m.idMessageHistory = :idMessageHistory")
+    , @NamedQuery(name = "Mailstatus.findByIdMailStatus", query = "SELECT m FROM Mailstatus m WHERE m.idMailStatus = :idMailStatus")
     , @NamedQuery(name = "Mailstatus.findByStatus", query = "SELECT m FROM Mailstatus m WHERE m.status = :status")
     , @NamedQuery(name = "Mailstatus.findByDate", query = "SELECT m FROM Mailstatus m WHERE m.date = :date")
     , @NamedQuery(name = "Mailstatus.findByMailStatus", query = "SELECT m FROM Mailstatus m WHERE m.mailStatus = :mailStatus")})
@@ -36,9 +39,10 @@ public class Mailstatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "idMessageHistory")
-    private Integer idMessageHistory;
+    @Column(name = "idMailStatus")
+    private Integer idMailStatus;
     @Basic(optional = false)
     @Column(name = "status")
     private String status;
@@ -49,35 +53,35 @@ public class Mailstatus implements Serializable {
     @Column(name = "mailStatus")
     private String mailStatus;
     @JoinColumn(name = "idClient", referencedColumnName = "idClient")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Client idClient;
     @JoinColumn(name = "idMailAccounts", referencedColumnName = "idMailAccounts")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Mailaccount idMailAccounts;
     @JoinColumn(name = "idMail", referencedColumnName = "idMail")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Mail idMail;
 
     public Mailstatus() {
     }
 
-    public Mailstatus(Integer idMessageHistory) {
-        this.idMessageHistory = idMessageHistory;
+    public Mailstatus(Integer idMailStatus) {
+        this.idMailStatus = idMailStatus;
     }
 
-    public Mailstatus(Integer idMessageHistory, String status, String date, String mailStatus) {
-        this.idMessageHistory = idMessageHistory;
+    public Mailstatus(Integer idMailStatus, String status, String date, String mailStatus) {
+        this.idMailStatus = idMailStatus;
         this.status = status;
         this.date = date;
         this.mailStatus = mailStatus;
     }
 
-    public Integer getIdMessageHistory() {
-        return idMessageHistory;
+    public Integer idMailStatus() {
+        return idMailStatus;
     }
 
-    public void setIdMessageHistory(Integer idMessageHistory) {
-        this.idMessageHistory = idMessageHistory;
+    public void idMailStatus(Integer idMailStatus) {
+        this.idMailStatus = idMailStatus;
     }
 
     public String getStatus() {
@@ -131,7 +135,7 @@ public class Mailstatus implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idMessageHistory != null ? idMessageHistory.hashCode() : 0);
+        hash += (idMailStatus != null ? idMailStatus.hashCode() : 0);
         return hash;
     }
 
@@ -142,7 +146,7 @@ public class Mailstatus implements Serializable {
             return false;
         }
         Mailstatus other = (Mailstatus) object;
-        if ((this.idMessageHistory == null && other.idMessageHistory != null) || (this.idMessageHistory != null && !this.idMessageHistory.equals(other.idMessageHistory))) {
+        if ((this.idMailStatus == null && other.idMailStatus != null) || (this.idMailStatus != null && !this.idMailStatus.equals(other.idMailStatus))) {
             return false;
         }
         return true;
@@ -150,7 +154,7 @@ public class Mailstatus implements Serializable {
 
     @Override
     public String toString() {
-        return "com.pachole.entities.Mailstatus[ idMessageHistory=" + idMessageHistory + " ]";
+        return "com.pachole.entities.Mailstatus[ idMailStatus=" + idMailStatus + " ]";
     }
     
 }

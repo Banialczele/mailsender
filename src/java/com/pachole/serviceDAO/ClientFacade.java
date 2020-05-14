@@ -65,10 +65,9 @@ public class ClientFacade extends AbstractFacade<Client> {
 
     public List<Client> findClientEmailByEtiquetteName(List<String> etiquetteName) {
         List<Client> result = new ArrayList<>();
-
         try {
             for (int i = 0; i < etiquetteName.size(); ++i) {
-                result.addAll(em.createQuery("SELECT c.email FROM Client c INNER JOIN c.etiquetteCollection x WHERE x.idGroup IN (SELECT e.idGroup FROM Etiquette e INNER JOIN e.clientCollection h WHERE e.name = :name)", Client.class).setParameter("name", etiquetteName.get(i)).getResultList());
+                result.addAll(em.createQuery("SELECT c FROM Client c INNER JOIN c.etiquetteCollection x WHERE x.idGroup IN (SELECT e.idGroup FROM Etiquette e INNER JOIN e.clientCollection h WHERE e.name = :name)", Client.class).setParameter("name", etiquetteName.get(i)).getResultList());
             }
         } catch (Exception e) {
             throw new Error(e);
