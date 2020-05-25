@@ -8,21 +8,25 @@
         <h:outputStylesheet name="css/index.css"/>
     </h:head>
     <h:body>
+        <p:messages globalOnly="true" closable="true" style="width: 30%;"/>
         <div class="loginContainer">
-            <h:form>
-                <div class="ui-fluid">
-                    <p:panel style="background: inherit; border: none; color: inherit;">
-                        <h:panelGrid style="margin: 0 auto;" columns="1" styleClass="ui-panelgrid-blank ui-fluid">
-                            <h:outputLabel for="email" value="Email: "/>
-                            <p:inputText id="email" value="#{login.email}" required="true" label="email"/>
-                            <h:outputLabel for="password" value="Password: "/>
-                            <p:password id="password" value="#{login.password}" required="true" label="password"/>
-                            <p:commandButton action="#{login.doLogin()}" value="Login"/>
-                            <p:commandButton action="/registration/registration.xhtml?faces-redirect=true" value="Zarejestruj"/>
-                        </h:panelGrid>
-                    </p:panel>
+            <h:form >
+                <div class="ui-fluid" style="padding: 0 50px;">
+                    <h:panelGrid id="loginGrid" style="margin: 0 auto;" columns="3" styleClass="ui-panelgrid-blank ui-fluid">
+                        <h:outputLabel for="email" value="Email: "/>
+                        <p:inputText id="email" value="#{login.email}" required="true" requiredMessage="Proszę wprowadzić email"/>
+                        <p:message for="email"/>
+
+                        <h:outputLabel for="password" value="Password: "/>
+                        <p:password id="password" value="#{login.password}" required="true" requiredMessage="Proszę wprowadzić hasło"/>
+                        <p:message for="password"/>
+
+                    </h:panelGrid>
+                    <p:commandButton style="width: 30%; text-align: center;" update="loginGrid" action="#{login.doLogin()}" value="Login"/>
                 </div>
             </h:form>
+            <h:form><p:commandButton action="registration" value="Zarejestruj"/></h:form>
+
         </div>
     </h:body>
 </html>

@@ -9,7 +9,6 @@ body {
     flex-direction: column;
 }
 
-.groupTable {
-    border-radius: 5px;
+.ui-datatable-data ui-widget-content{
+    border-style: none !important;
 }
-

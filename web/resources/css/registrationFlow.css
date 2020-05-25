@@ -2,22 +2,51 @@ body {
     margin: 0;
     height: 100%;
     width: 100%;
-    background: rgb(65,65,65);
+    background: rgb(35,35,35);
     display: flex;
     flex-direction: column;
     text-align: center;
     font-size: 20px;
 }
 
-.registerForm{
-    background: rgba(0,145,255,0.9);
-    width: 20vw;
-    margin: 120px auto;
+.ui-panel-content {
+    background: rgb(245,245,245) !important;
+    width: 45vw;
+    margin: 50px auto;
     display: flex;
     flex-direction: column;
-    padding: 20px 50px;
+    padding: 50px 50px;
+    border-radius: 20px;
 }
 
 .registerForm > *{
     margin: 8px;
 }
+
+.styleForm {
+    width: 50vw !important;
+    margin: 0 auto;
+}
+
+.clientForm {
+    background: rgb(245,245,245) !important;
+    width: 100%;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 50px;
+    border-radius: 20px;
+}
+
+.ui-panelgrid-cell {
+    border-style: none !important;
+}
+
+.centerButtons {
+    margin: 5px auto;
+}
+
+.ui-button {
+    width: 25%;
+}
+

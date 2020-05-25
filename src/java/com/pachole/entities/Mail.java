@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Message.findByMessageTopic", query = "SELECT m FROM Mail m WHERE m.messageTopic = :messageTopic")
     , @NamedQuery(name = "Message.findByDate", query = "SELECT m FROM Mail m WHERE m.date = :date")
     , @NamedQuery(name = "Message.findByAuthorName", query = "SELECT m FROM Mail m WHERE m.authorName = :authorName")
-    , @NamedQuery(name = "Message.findByLoggedUser", query = "SELECT DISTINCT m FROM Mail m WHERE m.idUser = :idUser GROUP BY m.messageTopic")
+    , @NamedQuery(name = "Message.findByLoggedUser", query = "SELECT m FROM Mail m WHERE m.idUser = :idUser")
 })
 public class Mail implements Serializable {
 
@@ -68,7 +68,7 @@ public class Mail implements Serializable {
     private String authorName;
     @ManyToMany(mappedBy = "mailCollection")
     private Collection<Etiquette> etiquetteCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMail")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMail",orphanRemoval = true)
     private Collection<Mailstatus> mailstatusCollection;
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)

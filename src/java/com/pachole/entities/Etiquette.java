@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Etiquette.findByArchive", query = "SELECT e FROM Etiquette e WHERE e.archive = :archive")
     , @NamedQuery(name = "Etiquette.findAllByUserId", query = "SELECT e FROM Etiquette e WHERE e.idUser = :idUser")
     , @NamedQuery(name = "Etiquette.findAllNamesByUser", query = "SELECT e.name FROM Etiquette e WHERE e.idUser = :idUser")
+        , @NamedQuery(name = "Etiquette.findAllNames", query = "SELECT e.name FROM Etiquette e WHERE e.idUser = :idUser")
 })
 public class Etiquette implements Serializable {
 
@@ -58,9 +59,9 @@ public class Etiquette implements Serializable {
     @JoinTable(name = "mail_has_etiquette", joinColumns = {
         @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")}, inverseJoinColumns = {
         @JoinColumn(name = "idMail", referencedColumnName = "idMail")})
-    @ManyToMany
+    @ManyToMany()
     private Collection<Mail> mailCollection;
-    @ManyToMany(mappedBy = "etiquetteCollection", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "etiquetteCollection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<Client> clientCollection = new ArrayList<>();
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)

@@ -23,6 +23,7 @@
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
                     <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
                     <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
                 </p:submenu>
@@ -35,25 +36,19 @@
             </p:menubar>
         </h:form>
 
-        <div class="clientContainer">
-            <h:form id="manageClientsForm" style="margin: 0 auto; width: 100vw;">                
-                <c:forEach items="#{myClient.clientList}" var="client">
-                    <p:panelGrid columns="5" style="text-align: center; margin: 5px auto;">
-                        <p:outputLabel value="Nazwa klienta: "/>
-                        <p:inputText id="clientName" value="#{client.name}"></p:inputText>
+        <h:form id="etiquetteForm" class="etiquettteForm">
+            <p:panelGrid columns="1" layout="grid" style="margin: 10px auto; width: 100vw;">
+<!--                <p:outputLabel value="Wybierz etykiete: "/>
+                <p:selectOneMenu value="#{myClient.etiquetteName}">
+                    <f:selectItem itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
+                    <f:selectItems value="#{myClient.existingEtiquettes}" var="etiquette" itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
+                </p:selectOneMenu>-->
+                <p:outputLabel value="Dodaj nową etykiete"/>
+                <p:inputText id="etiquetteName" value="#{myClient.etiquetteNameFromInput}"></p:inputText>
+                            <p:commandButton value="Zapisz etykiete" action="#{myClient.saveEtiquette}"/>
 
-                        <p:outputLabel value="Adres email klienta"/>
-                        <p:inputText id="clientEmail" value="#{client.email}"></p:inputText>
-                        <p:commandButton value="Usuń" action="#{myClient.delete(client)}">
-                            <f:ajax execute="@form" render="manageClientsForm" />
-                        </p:commandButton>
-                    </p:panelGrid>
-                </c:forEach>
-                <p:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true" update="manageClientsForm" />
-                <p:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
-                </p:commandButton><br></br>
-                <h:messages for="saveClients"/>
-            </h:form>
-        </div>
+            </p:panelGrid>
+        </h:form>
     </h:body>
 </html>
+

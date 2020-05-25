@@ -13,40 +13,44 @@
     </h:head>
     <h:body>
         <h:form class="navbarform">
-            <p:menubar style="margin: 20px auto; width: 70vw;">
+            <p:menubar style="margin: 20px auto; width: 98vw;">
                 <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
-                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
                     <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
                     <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
                     <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Przypisz etykiete" outcome="assignLabel.xhtml"/>
                 </p:submenu>
                 <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
 
-        <h:form id="groupsForm">
-            <p:dataTable id="groupTable" class="groupTable" value="#{showClients.etiquetteList}" 
-                         var="e" 
-                         style="width: 80%; margin:0 auto;" 
-                         paginator="true" 
-                         rows="5" 
-                         rowsPerPageTemplate="5,10,15,20,50" 
-                         lazy="true" 
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                <p:column>
-                    <f:facet name="header">Lista etykiet oraz klientów</f:facet>                    
-                    <p:panel id="toggleable" header="#{e.name}" toggleable="true" toggleSpeed="500" collapsed="true" style="margin: 5px 0; border: 0;">
-                        <p:panel id="client" header="Klient" toggleSpeed="500" style="margin: 5px 0; border: 0;">                            
+        <h:form id="etiquetteForm">
+            <p:panel>
+                <h:outputText value="Brak etykiet" rendered="#{empty showClients.etiquetteList}" />
+                <p:dataTable id="groupTable" class="groupTable" value="#{showClients.etiquetteList}" 
+                             var="e" 
+                             rendered="#{not empty showClients.etiquetteList}"
+                             styleClass="borderless"
+                             paginator="true" 
+                             rows="5" 
+                             rowsPerPageTemplate="5,10,15,20,50" 
+                             lazy="true" 
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
+                    <p:column>
+                        <f:facet name="header">Lista etykiet oraz klientów</f:facet>                    
+                        <p:panel id="toggleable" header="#{e.name}" toggleable="true" toggleSpeed="500" collapsed="true" style="margin: 5px 0; border: 0;">                         
                             <p:dataTable value="#{e.clientCollection}"
                                          id="clientData"
                                          var="c" 
@@ -57,9 +61,10 @@
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
                                          reflow="true"
+                                         styleClass="borderless"
                                          >
-                                <p:column>
-                                    <p:panelGrid columns="3" style="margin: 5px 0; border: 0;">                                        
+                                <p:column headerText="Klient">   
+                                    <p:panelGrid columns="3">
                                         <p:column headerText="Name" priority="1">                                            
                                             #{c.name}
                                         </p:column>
@@ -69,31 +74,42 @@
                                             </p:commandButton>
                                         </p:column>
                                         <p:column headerText="Email" priority="3">
-                                            <p:commandButton value="Usuń" action="#{showClients.delete(c)}">
-                                                <f:ajax execute="@form" render="groupsForm:clientData" />
-                                            </p:commandButton>
+                                            <p:commandButton value="Usuń" action="#{showClients.delete(c)}" update="etiquetteForm" />
                                         </p:column>
                                     </p:panelGrid>
                                 </p:column>
                             </p:dataTable>
                         </p:panel>
-                    </p:panel>
-                </p:column>
-            </p:dataTable>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
         </h:form>
-        
-        <h:form id="dialog">
-            <p:dialog header="Dane klienta: #{showClients.showClientDetails.name}" widgetVar="details">
-                <p:panelGrid columns="2">
-                    <h:outputText value="Nazwa klienta: "/>
-                    <h:outputText value="#{showClients.showClientDetails.name}"/>
-                    
-                    <h:outputText value="Email klienta: "/>
-                    <h:outputText value="#{showClients.showClientDetails.email}"/>
-                    
-                    <h:outputText value="Status klienta: "/>
-                    <h:outputText value="Aktywny"/>
-                </p:panelGrid>
+
+        <h:form id="dialog" style="width: 60vw;">
+            <p:dialog header="Dane klienta: #{showClients.showClientDetails.name}" widgetVar="details" style="width: 60vw;">
+                <p:dataTable value="#{showClients.showClientDetails}" 
+                             var="client" 
+                             widgetVar="client" 
+                             editable="true" 
+                             editMode="cell" 
+                             >   
+                    <p:ajax event="cellEdit" listener="#{showClients.onCellEdit}"/>
+                    <f:facet name="header">
+                        <h:outputText value="Dostępne wartości statusu: 0-nieaktywny, 1-aktywny"/>
+                    </f:facet>
+                    <p:column headerText="Nazwa klienta">
+                        <h:outputText value="#{client.name}"/>
+                    </p:column>
+                    <p:column headerText="Email">
+                        <h:outputText value="#{client.email}"/>
+                    </p:column>
+                    <p:column headerText="Status, naciśnij LPM aby edytować">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{client.status}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{client.status}" label="Status"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                </p:dataTable>
             </p:dialog>
         </h:form>
     </h:body>

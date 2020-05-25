@@ -56,12 +56,15 @@ public class Client implements Serializable {
     @Basic(optional = false)
     @Column(name = "email")
     private String email;
+    @Basic(optional = false)
+    @Column(name = "status")
+    private Integer status;
     @JoinTable(name = "client_has_etiquette", joinColumns = {
         @JoinColumn(name = "idClient", referencedColumnName = "idClient")}, inverseJoinColumns = {
         @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")})
     @ManyToMany()
     private Collection<Etiquette> etiquetteCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idClient")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idClient", orphanRemoval = true)
     private Collection<Mailstatus> mailstatusCollection;
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
@@ -74,10 +77,11 @@ public class Client implements Serializable {
         this.idClient = idClient;
     }
 
-    public Client(Integer idClient, String name, String email) {
+    public Client(Integer idClient, String name, String email, Integer status) {
         this.idClient = idClient;
         this.name = name;
         this.email = email;
+        this.status = status;
     }
 
     public Integer getIdClient() {
@@ -102,6 +106,14 @@ public class Client implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @XmlTransient

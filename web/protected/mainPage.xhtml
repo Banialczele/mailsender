@@ -11,51 +11,73 @@
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
+        <h:form id="messageForm">
+            <p:messages for="login" globalOnly="true" closable="true" style="width: 30%;"/>
+        </h:form>
+
         <h:form class="navbarform">
-            <p:menubar style="margin: 20px auto; width: 70vw;">
+            <p:menubar style="margin: 20px auto; width: 98vw;">
                 <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
-                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
                     <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
                     <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
                     <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Przypisz etykiete" outcome="assignLabel.xhtml"/>
                 </p:submenu>
                 <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
 
-        <h:form id="groupsForm" style="width: 80%; margin: 0 auto;">
-            <p:dataTable value="#{mailMessages.messageList}" 
-                         var="message"
-                         paginator="true" 
-                         rows="5" 
-                         rowsPerPageTemplate="5,10,15,20,50"                                       
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records" widgetVar="messageList"
-                         style="width: 80%; margin: 0 auto;"
-                         id="messegeRecords"
-                         >
-                <f:facet name="header">                   
-                    Lista wiadomości
-                </f:facet>
-                <p:column id="column" headerText="Temat" sortBy="#{message.messageTopic}" filterable="true" filterMatchMode="contains" filterBy="#{message.messageTopic}">
-                    <p:panelGrid columns="3">
+        <h:form id="mainPageForm" style="width: 100%; ">
+            <p:panel>
+                <h:outputText value="Brak mailingu" rendered="#{empty mailMessages.messageList}" />
+                <p:dataTable value="#{mailMessages.messageList}"
+                             rendered="#{not empty mailMessages.messageList}"
+                             var="message"
+                             paginator="true" 
+                             rows="5"
+                             rowsPerPageTemplate="5,10,15,20,50" 
+                             widgetVar="messageTable"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             id="messegeRecords"
+                             filteredValue="#{mailMessages.filteredMails}"
+                             emptyMessage="No messages found with given criteria"
+                             globalFilterFunction="#{mailMessages.globalFilterFunction}"
+                             >
+                    <f:facet name="header">
+                        <p:outputPanel>
+                            <h:outputText value="Znajdź wiadomość:" />
+                            <p:inputText id="globalFilter" onkeyup="PF('messageTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+                        </p:outputPanel>
+                    </f:facet>
+
+                    <p:column headerText="Temat" sortBy="#{message.messageTopic}">
                         <h:outputText value="#{message.messageTopic}"/>
+                    </p:column>
+                    <p:column headerText="Szczegóły">
                         <p:commandButton value="Szczegóły" oncomplete="PF('details').show();" update=":dialog" ajax="true" >
                             <f:setPropertyActionListener value="#{message}" target="#{mailMessages.selectedMail}" />  
                         </p:commandButton>
-                        <p:commandButton value="Wyślij ponownie" action="#{mailSend.sendMessage(message)}"/>
-                    </p:panelGrid>                    
-                </p:column> 
-            </p:dataTable> 
+                    </p:column>       
+                    <p:column headerText="Wyslij ponownie">
+                        <p:commandButton value="Wyślij ponownie" action="#{mailSend.sendMessage(message)}"/>            
+                        <p:messages id="messages" for="groupsForm" globalOnly="true" showDetail="true" closable="true">
+                            <p:autoUpdate />
+                        </p:messages>
+                    </p:column> 
+                </p:dataTable> 
+            </p:panel>
         </h:form>
         <h:form id="dialog">            
             <p:dialog id="myDialog" header="Wiadomość: #{mailMessages.selectedMail.messageTopic}" widgetVar="details">

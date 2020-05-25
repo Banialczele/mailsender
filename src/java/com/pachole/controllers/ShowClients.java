@@ -8,7 +8,10 @@ import com.pachole.serviceDAO.EtiquetteFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -17,6 +20,7 @@ import javax.inject.Inject;
 import org.primefaces.event.ToggleEvent;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
+import org.primefaces.event.CellEditEvent;
 
 @Named
 @ViewScoped
@@ -40,14 +44,30 @@ public class ShowClients implements Serializable {
         etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
     }
 
-    public void deleteEtiquette(Etiquette etiquette) {
-        etiquetteDAO.remove(etiquette);
-    }
-
     public void delete(Client client) {
         System.out.println(client);
-        clientList.remove(client);
+        etiquetteList.forEach(etiquette -> {
+            System.out.println("przed: " + etiquette.getClientCollection());
+            etiquette.getClientCollection().remove(client);
+            System.out.println("po: " + etiquette.getClientCollection());
+        });
         clientDAO.remove(client);
+    }
+
+    public void onCellEdit(CellEditEvent event) {
+        Object oldValue = event.getOldValue();
+        Object newValue = event.getNewValue();
+        FacesContext context = FacesContext.getCurrentInstance();
+        Client client = context.getApplication().evaluateExpressionGet(context, "#{client}", Client.class);
+
+        if (newValue != null && !newValue.equals(oldValue)) {
+            client.setStatus((int) newValue);
+            try {
+                clientDAO.edit(client);
+            } catch(Exception e){
+                throw new Error(e);
+            }
+        }
     }
 
     public void onToggle(ToggleEvent event) {

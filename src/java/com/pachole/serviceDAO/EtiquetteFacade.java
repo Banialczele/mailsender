@@ -74,6 +74,16 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         }
         return result;
     }
+    
+    public List<Etiquette> getEtiquetteName(User userId) {
+        List<Etiquette> result;
+        try {
+            result = getEntityManager().createNamedQuery("Etiquette.findAllNames", Etiquette.class).setParameter("idUser", userId).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
 
     public void updateEtiquetteMailCollection(Etiquette etiquette) {
         Etiquette result = null;

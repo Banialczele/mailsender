@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Mail Sender App</title>
+        <h:outputStylesheet name="css/navStyle.css" />
+        <h:outputStylesheet name="css/mainPage.css"/>
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+    </h:head>
+    <h:body>
+        <h:form id="messageForm">
+            <p:messages for="login" globalOnly="true" closable="true" style="width: 30%;"/>
+        </h:form>
+
+        <h:form class="navbarform">
+            <p:menubar style="margin: 20px auto; width: 98vw;">
+                <p:submenu label="Etykiety" icon="pi pi-tag">
+                    <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
+                </p:submenu>
+                <p:submenu label="Wiadomości" icon="pi pi-envelope">
+                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
+                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
+                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
+                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                </p:submenu>
+                <p:submenu label="Klienci" icon="pi pi-user">
+                    <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
+                    <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Przypisz etykiete" outcome="assignLabel.xhtml"/>
+                </p:submenu>
+                <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
+            </p:menubar>
+        </h:form>
+
+        <h:form id="assignLabelForm">
+            <p:panel>
+                <h:outputText value="Brak klientów bez etykiety" rendered="#{empty assignLabel.clientList}" />
+                <p:dataTable value="#{assignLabel.clientList}" 
+                             rendered="#{not empty assignLabel.clientList}"
+                             var="client" 
+                             paginator="true" 
+                             rows="10" 
+                             rowsPerPageTemplate="5,10,15,20,50"    
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"                         
+                             >
+                    <f:facet name="header">
+                        Lista nieprzypisanych klientów                    
+                    </f:facet>
+                    <p:column headerText="Nazwa klienta" sortBy="#{client.name}">
+                        <h:outputText value="#{client.name}"/>
+                    </p:column>
+                    <p:column headerText="Email klienta">
+                        <h:outputText value="#{client.email}"/>
+                    </p:column>
+                    <p:column headerText="Szczegóły">
+                        <p:commandButton value="#{client.name}" oncomplete="PF('clientDialog').show();" ajax="true" update="dialog">
+                            <f:setPropertyActionListener value="#{client}" target="#{assignLabel.selectedClient}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column headerText="Przypisz etykiete">
+                        <p:commandButton value="Wybierz etykiete" oncomplete="PF('selectEtiquette').show();" ajax="true" update="selectEtiquette">
+                            <f:setPropertyActionListener value="#{client}" target="#{assignLabel.selectedClient}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable> 
+            </p:panel>
+        </h:form>
+
+        <h:form id="dialog">
+            <p:dialog header="O kliencie #{assignLabel.selectedClient.name}" widgetVar="clientDialog" minHeight="40" >
+                <p:panelGrid columns="3">
+                    <h:outputText value="Email"/>
+                    <h:outputText value="Etykieta"/>
+                    <h:outputText value="Status"/>
+
+                    <h:outputText value="#{assignLabel.selectedClient.email}"/>
+                    <h:outputText rendered="#{empty assignLabel.etiquetteList}" value="Brak przypisanej etykiety"/>
+                    <h:outputText value="#{assignLabel.selectedClient.status == '1' ? 'aktywny' : 'nieaktywny'}"/>
+                </p:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="selectEtiquette">
+            <p:dialog header="Wybierz etykiete z listy" widgetVar="selectEtiquette" minHeight="40" minWidth="50" id="etiquetteId">
+                <p:selectOneMenu value="#{assignLabel.etiquette}" dynamic="true" required="true">
+                    <f:selectItem itemLabel="Wybierz jedną z listy " itemValue="" />      
+                    <f:selectItems value="#{assignLabel.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
+                </p:selectOneMenu>
+                <p:commandButton value="Zapisz" 
+                                 action="#{assignLabel.updateClient()}" 
+                                 update="@form"                                  
+                                 process="@form :selectEtiquette"
+                                 onclick="PF('selectEtiquette').hide();"      
+                                 />
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+

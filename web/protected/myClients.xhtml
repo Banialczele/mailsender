@@ -13,40 +13,62 @@
     </h:head>
     <h:body>
         <h:form class="navbarform">
-            <p:menubar style="margin: 20px auto; width: 70vw;">
+            <p:menubar style="margin: 20px auto; width: 98vw;">
                 <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
-                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
                     <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
                     <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
                     <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Przypisz etykiete" outcome="assignLabel.xhtml"/>
                 </p:submenu>
                 <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
 
-        <h:form id="groupsForm">
-            <p:dataTable id="groupTable" class="groupTable" value="#{displayClients.clientList}" 
+        <h:form id="myClientsForm">
+            <p:dataTable id="groupTable" 
+                         class="groupTable" 
+                         value="#{displayClients.clientList}" 
                          var="c" 
-                         style="width: 80%; margin:0 auto;" 
+                         style="width: 100%;" 
                          paginator="true" 
                          rows="10" 
-                         rowsPerPageTemplate="5,10,15,20,50" 
-                         lazy="true" 
+                         rowsPerPageTemplate="5,10,15,20,50"    
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                <p:column headerText="Imie">
+                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                         widgetVar="clientTable"
+                         filteredValue="#{displayClients.filteredList}"
+                         globalFilterFunction="#{displayClients.globalFilterFunction}"
+                         emptyMessage="Nie znaleziono klienta"
+                         >
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <h:outputText value="Filtruj klientów: " />
+                        <p:inputText id="globalFilter" onkeyup="PF('clientTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+                    </p:outputPanel>
+                </f:facet>
+                <p:column headerText="Imie" sortBy="#{c.name}">
                     <h:outputText value="#{c.name}"/>
                 </p:column>                
-                <p:column headerText="Email"><h:outputText value="#{c.email}"/></p:column>
+                <p:column headerText="Email">
+                    <h:outputText value="#{c.email}"/>
+                </p:column>
+                <p:column headerText="Status">
+                    <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
+                </p:column>                
+                <p:column headerText="Usuń">
+                    <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="myClientsForm"/>
+                </p:column>
             </p:dataTable>
         </h:form>
     </h:body>

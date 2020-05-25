@@ -2,37 +2,43 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"    
-      >
+
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Registration form</title>
-        <h:outputStylesheet name="../styles/registrationFlow.css"/>
+        <h:outputStylesheet name="css/registrationFlow.css"/>
     </h:head>
     <h:body>
-        <p>
-                #{ null != facesContext.application.flowHandler.currentFlow}
-            #{facesContext.application.flowHandler.currentFlow.id}
-        </p>
         <div class="registerContainer">
             <div class="formContainer">
-                <h:form id="registerForm" class="registerForm">
-                    <h:outputText value="Username "/>
-                    <h:inputText id="username" value="#{registration.username}"></h:inputText>
+                <h:form>
+                    <div class="ui-fluid">
+                        <p:panel style="background: inherit; border: none; color: inherit;">
+                            <h:panelGrid id="registerGrid" style="margin: 0 auto;" columns="3" styleClass="ui-panelgrid-blank ui-fluid">
+                                <h:outputLabel for="username" value="Username " style="margin: 5px 0;"/>
+                                <p:inputText id="username" value="#{registration.username}" required="true" requiredMessage="Proszę wprowadzić nazwę użytkownika" style="margin: 5px 0;"></p:inputText>
+                                <h:message for="username"/>
 
-                    <h:outputText value="Password "/>
-                    <h:inputSecret id="password" value="#{registration.password}"></h:inputSecret>
+                                <h:outputLabel for="password" value="Password " style="margin: 5px 0;"/>
+                                <p:password id="password" value="#{registration.password}" required="true" requiredMessage="Proszę wprowadzić hasło" style="margin: 5px 0;"></p:password>
+                                <h:message for="password"/>
 
-                    <h:outputText value="Firstname "/>
-                    <h:inputText id="first" value="#{registration.first}"></h:inputText>
+                                <h:outputLabel for="first" value="Firstname " style="margin: 5px 0;"/>
+                                <p:inputText id="first" value="#{registration.first}" required="true" requiredMessage="Proszę wprowadzić imię" style="margin: 5px 0;"></p:inputText>
+                                <h:message for="first"/>
 
-                    <h:outputText value="Lastname "/>
-                    <h:inputText id="last" value="#{registration.last}"></h:inputText>
+                                <h:outputLabel for="last" value="Lastname " style="margin: 5px 0;"/>
+                                <p:inputText id="last" value="#{registration.last}" required="true" requiredMessage="Proszę wprowadzić nazwisko" style="margin: 5px 0;"></p:inputText>
+                                <h:message for="last"/>
 
-                    <h:outputText value="Email "/>
-                    <h:inputText id="email" value="#{registration.email}"></h:inputText>
-                    <h:commandButton id="register" action="#{registration.register}" value="Zarejestruj" style="margin: 15px auto; width: 35%; "></h:commandButton>
-                    <h:commandButton action="cancel" value="Anuluj" style="margin: 15px auto; width: 35%; "></h:commandButton>
-                    
-                    <h:messages for="register"/>
+                                <h:outputLabel for="email" value="Email " style="margin: 5px 0;"/>
+                                <p:inputText id="email" value="#{registration.email}" required="true" requiredMessage="Proszę wprowadzić adres email" style="margin: 5px 0;"></p:inputText>
+                                <h:message for="email"/>
+
+                            </h:panelGrid>
+                            <p:commandButton id="register" action="#{registration.register}" value="Zarejestruj" update="registerGrid" style="width: 30%; margin: 0 auto;"></p:commandButton>     
+                        </p:panel>
+                    </div>
                 </h:form>
             </div> 
         </div>

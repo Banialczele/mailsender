@@ -41,9 +41,9 @@ public class MailFacade extends AbstractFacade<Mail> {
     }
     
     public List<Mail> findByLoggedUser(User user){
-        List<Mail> result;
-        try{
-            result = getEntityManager().createNamedQuery("Message.findByLoggedUser", Mail.class).setParameter("idUser", user).getResultList();
+        List<Mail> result; 
+       try{
+            result = getEntityManager().createNativeQuery("SELECT * FROM Mail WHERE idUser = "+user.getIdUser()+" GROUP BY BINARY messageTopic", Mail.class).getResultList();
         } catch(Exception e){
             throw new Error(e);
         }

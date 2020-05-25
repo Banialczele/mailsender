@@ -3,31 +3,37 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Mail Sender App</title>
+        <title>Add clients to registered user</title>
+        <h:outputStylesheet name="css/registrationFlow.css"/>
     </h:head>
     <h:body>
         <h1>Add clients to registered user</h1>
-        <p>
-            #{ null != facesContext.application.flowHandler.currentFlow}
-            #{facesContext.application.flowHandler.currentFlow.id}
-        </p>
-        <h:form id="clientsForm">
-            <c:forEach items="#{registration.clientsList}" var="client">
-                <h:outputText value="Client Name"/>
-                <h:inputText id="clientName" value="#{client.name}"></h:inputText>
-                <h:outputText value="Client company name" />
-                <br></br><br></br>          
+        <div class="styleForm">
+        <h:form id="clientsForm" class="clientForm">
+            <c:forEach items="#{registration.clientsList}" var="client" >
+                <p:panelGrid columns="2" style="margin: 5px 0;">
+                    <h:outputText value="Client Name"/>
+                    <p:inputText id="clientName" value="#{client.name}">
+                    </p:inputText>  
+                    <h:outputText value="Client Email"/>
+                    <p:inputText id="clientName" value="#{client.email}">
+                    </p:inputText> 
+                </p:panelGrid>
             </c:forEach>
-            <h:commandButton value="Add client" action="#{registration.addClients()}" immediate="true">
+            <div style="centerButtons">  
+            <p:commandButton value="Add client" action="#{registration.addClients()}" immediate="true">
                 <f:ajax execute="@form" render="clientsForm" /> 
-            </h:commandButton>
-            <h:commandButton id="saveClients" value="Save clients" action="#{registration.saveClient}">
-            </h:commandButton><br></br>
+            </p:commandButton>
+            <p:commandButton id="saveClients" value="Save clients" action="#{registration.saveClient}">
+            </p:commandButton><br></br>
+            </div>
             <h:messages for="saveClients"/>
-            <h:commandButton  id="skip" action="#{registration.skipAddClient()}" value="Pomiń" style="margin: 15px auto; width: 35%; "></h:commandButton>
+            <p:commandButton  id="skip" action="#{registration.skipAddClient()}" value="Pomiń" style="margin: 15px auto; width: 35%; "></p:commandButton>
         </h:form>
+        </div>
     </h:body>
 </html>
 

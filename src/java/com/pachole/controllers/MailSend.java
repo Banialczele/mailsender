@@ -26,6 +26,8 @@ import javax.mail.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -90,23 +92,21 @@ public class MailSend implements Serializable {
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
             Date currentDay = new Date();
         } else if (selectedMessage != null) {
-
             topic = selectedMessage.getMessageTopic();
             content = selectedMessage.getMessageContent();
             for (Etiquette e : selectedMessage.getEtiquetteCollection()) {
                 etiquetteName.add(e.getName());
             }
-
             clientData = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
             etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
 
         }
 
         String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         Date currentDay = new Date();
         Properties prop = new Properties();
-        
+
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
         prop.put("mail.smtp.auth", "true");
@@ -125,54 +125,60 @@ public class MailSend implements Serializable {
         Mail emailMessage;
         Mailstatus emailStatus = new Mailstatus();
         for (Client client : clientData) {
-            try {
-                receiver = client.getEmail();
-                emailMessage = new Mail();
-
-                emailMessage.setReceiver(receiver.trim());
-                emailMessage.setMessageContent(content.trim());
-                emailMessage.setMessageTopic(topic.trim());
-                emailMessage.setDate(df.format(currentDay));
-                emailMessage.setAuthorName(author);
-                emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
-                emailMessage.setIdUser(loggedUser);
-                emailMessage.getEtiquetteCollection().addAll(etiquetteCollection);
-
+            if (client.getStatus() == 1) {
                 try {
-                    for (Etiquette e : etiquetteCollection) {
-                        mailDAO.create(emailMessage);
-                        e.getMailCollection().add(emailMessage);
-                        etiquetteDAO.updateEtiquetteMailCollection(e);
+                    receiver = client.getEmail();
+                    emailMessage = new Mail();
 
-                        emailStatus.setDate(df.format(currentDay));
-                        emailStatus.setMailStatus("Oczekuje na wysłanie");
-                        emailStatus.setStatus("Oczekuje na wysłanie");
-                        emailStatus.setIdClient(client);
-                        emailStatus.setIdMail(emailMessage);
-                        emailStatus.setIdMailAccounts(mailAccount);
-                        statusDAO.create(emailStatus);
+                    emailMessage.setReceiver(receiver.trim());
+                    emailMessage.setMessageContent(content.trim());
+                    emailMessage.setMessageTopic(topic.trim());
+                    emailMessage.setDate(df.format(currentDay));
+                    emailMessage.setAuthorName(author);
+                    emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
+                    emailMessage.setIdUser(loggedUser);
+                    emailMessage.getEtiquetteCollection().addAll(etiquetteCollection);
+
+                    try {
+                        for (Etiquette e : etiquetteCollection) {
+                            mailDAO.create(emailMessage);
+                            e.getMailCollection().add(emailMessage);
+                            etiquetteDAO.updateEtiquetteMailCollection(e);
+
+                            emailStatus.setDate(df.format(currentDay));
+                            emailStatus.setMailStatus("0");
+                            emailStatus.setStatus("0");
+                            emailStatus.setIdClient(client);
+                            emailStatus.setIdMail(emailMessage);
+                            emailStatus.setIdMailAccounts(mailAccount);
+                            statusDAO.create(emailStatus);
+                        }
+                    } catch (Exception e) {
+
+                        throw new Error(e);
                     }
-                } catch (Exception e) {
-                    throw new Error(e);
+
+                    Message message = new MimeMessage(session);
+                    message.setFrom(new InternetAddress(mailAccount.getMailAddress()));
+                    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
+                    message.setSubject(topic);
+                    message.setText(content);
+                    Transport.send(message);
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Pomyślnie wysłano wiadomość ", " " + message));
+
+                    emailStatus.setDate(df.format(currentDay));
+                    emailStatus.setMailStatus("1");
+                    emailStatus.setStatus("1");
+                    emailStatus.setIdClient(client);
+                    emailStatus.setIdMail(emailMessage);
+                    emailStatus.setIdMailAccounts(mailAccount);
+                    statusDAO.update(emailStatus);
+
+                } catch (AddressException ex) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udało się wysłać wiadomości", ""));
+
+                    Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(mailAccount.getMailAddress()));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
-                message.setSubject(topic);
-                message.setText(content);
-                Transport.send(message);
-
-                emailStatus.setDate(df.format(currentDay));
-                emailStatus.setMailStatus("Wysłano");
-                emailStatus.setStatus("Wysłano");
-                emailStatus.setIdClient(client);
-                emailStatus.setIdMail(emailMessage);
-                emailStatus.setIdMailAccounts(mailAccount);
-                statusDAO.update(emailStatus);
-
-            } catch (AddressException ex) {
-                Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         System.out.println("Done");

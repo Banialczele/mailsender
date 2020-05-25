@@ -11,30 +11,33 @@
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
-        <h:form class="navbarform">
-            <p:menubar style="margin: 20px auto; width: 70vw;">
+
+         <h:form class="navbarform">
+            <p:menubar style="margin: 20px auto; width: 98vw;">
                 <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
-                    <p:menuitem value="Dodaj etykiete" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
                     <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
                     <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
+                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
                     <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
                     <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
                     <p:menuitem value="Dodaj klienta" outcome="manageClients.xhtml"/>
+                    <p:menuitem value="Przypisz etykiete" outcome="assignLabel.xhtml"/>
                 </p:submenu>
                 <p:menuitem class="navbar-logout" value="Wyloguj" action="#{logout.logout()}" style="float:right;"/>
             </p:menubar>
         </h:form>
 
-        <h:form id="mailSenderForm" class="mailSenderForm" style="margin: 50px auto; background: rgb(245,245,245); padding: 40px 50px; border-radius: 15px;">
-            <div class="ui-fluid">
-                <h:panelGrid styleClass="senderGrid ui-fluid">
+        <h:form id="sendMessageForm" class="mailSenderForm" style="background: rgb(245,245,245); border-radius: 15px; width: 100vw;">
+            <div class="ui-fluid" >
+                <h:panelGrid styleClass="senderGrid ui-fluid" style="margin: 20px auto;">
                     <p:outputLabel value="Tytuł"/>
                     <p:inputText value="#{mailSend.topic}" placeholder="#{mailSend.topic}" required="true"></p:inputText>
                     <p:growl id="msgs" showDetail="true" />
@@ -43,9 +46,13 @@
                     <p:outputLabel value="Wiadomość" />
                     <p:inputTextarea value="#{mailSend.content}" required="true"/>
                     <p:commandButton value="Wyślij" action="#{mailSend.sendMessage(null)}"/>
-
                 </h:panelGrid>
-            </div>
+            </div>           
+        </h:form>
+        <h:form>
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
         </h:form>
     </h:body>
 </html>

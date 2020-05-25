@@ -9,6 +9,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
@@ -35,10 +36,14 @@ public class Login implements Serializable {
             session.setAttribute("userid", user.getIdUser());
             loggedUser = user;
             session.setAttribute("user", loggedUser);
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            Flash flash = facesContext.getExternalContext().getFlash();
+            flash.setKeepMessages(true);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully logged in!", null));
             return "/protected/mainPage?faces-redirect=true";
         } else {
             FacesContext ctx = FacesContext.getCurrentInstance();
-            ctx.addMessage(null, new FacesMessage("Unable to login, please check username and password"));
+            ctx.addMessage("messageForm:login", new FacesMessage("Unable to login, please check username and password"));
             return "index?faces-redirect=true";
         }
     }
