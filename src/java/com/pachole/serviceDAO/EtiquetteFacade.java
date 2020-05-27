@@ -7,6 +7,7 @@ package com.pachole.serviceDAO;
 
 import com.pachole.entities.Client;
 import com.pachole.entities.Etiquette;
+import com.pachole.entities.Mail;
 import com.pachole.entities.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         getEntityManager().remove(getEntityManager().merge(etiquette));
     }
 
-    public Etiquette checkExistance(String name) {
+    public Etiquette findByName(String name) {
         Etiquette result;
         try {
             result = getEntityManager().createNamedQuery("Etiquette.findByName", Etiquette.class).setParameter("name", name).getSingleResult();
@@ -52,7 +53,7 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         }
         return result;
     }
-
+    
     public List<Etiquette> findByEtiquetteName(List<String> name) {
         List<Etiquette> result = new ArrayList<Etiquette>();
         try {
@@ -74,7 +75,7 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         }
         return result;
     }
-    
+
     public List<Etiquette> getEtiquetteName(User userId) {
         List<Etiquette> result;
         try {

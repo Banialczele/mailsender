@@ -35,42 +35,65 @@
             </p:menubar>
         </h:form>
 
-        <h:form id="myClientsForm">
-            <p:dataTable id="groupTable" 
-                         class="groupTable" 
-                         value="#{displayClients.clientList}" 
-                         var="c" 
-                         style="width: 100%;" 
-                         paginator="true" 
-                         rows="10" 
-                         rowsPerPageTemplate="5,10,15,20,50"    
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                         widgetVar="clientTable"
-                         filteredValue="#{displayClients.filteredList}"
-                         globalFilterFunction="#{displayClients.globalFilterFunction}"
-                         emptyMessage="Nie znaleziono klienta"
-                         >
-                <f:facet name="header">
-                    <p:outputPanel>
-                        <h:outputText value="Filtruj klientów: " />
-                        <p:inputText id="globalFilter" onkeyup="PF('clientTable').filter()" style="width:150px" placeholder="Enter keyword"/>
-                    </p:outputPanel>
-                </f:facet>
-                <p:column headerText="Imie" sortBy="#{c.name}">
-                    <h:outputText value="#{c.name}"/>
-                </p:column>                
-                <p:column headerText="Email">
-                    <h:outputText value="#{c.email}"/>
-                </p:column>
-                <p:column headerText="Status">
-                    <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
-                </p:column>                
-                <p:column headerText="Usuń">
-                    <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="myClientsForm"/>
-                </p:column>
-            </p:dataTable>
-        </h:form>
+        <p:tabView dynamic="true" cache="false">
+            <p:tab title="Lista klientów" id="clientTab">
+                <h:form id="ClientsForm">
+                    <p:dataTable id="groupTable" 
+                                 class="groupTable" 
+                                 value="#{displayClients.clientList}" 
+                                 var="c" 
+                                 style="width: 100%;" 
+                                 paginator="true" 
+                                 rows="10"
+                                 lazy="true"
+                                 rowsPerPageTemplate="5,10,15,20,50"    
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"                         
+                                 >
+                        <p:column headerText="Imie">
+                            <h:outputText value="#{c.name}"/>
+                        </p:column>                
+                        <p:column headerText="Email">
+                            <h:outputText value="#{c.email}"/>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
+                        </p:column>                
+                        <p:column headerText="Usuń">
+                            <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="@form"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+            </p:tab>
+            <p:tab title="Szczegóły">
+                <h:form id="clientDetail">
+                    <p:dataTable id="groupTable" 
+                                 class="groupTable" 
+                                 value="#{displayClients.clientList}" 
+                                 var="c" 
+                                 style="width: 100%;" 
+                                 paginator="true" 
+                                 rows="10"
+                                 lazy="true"
+                                 rowsPerPageTemplate="5,10,15,20,50"    
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"                         
+                                 >
+                        <p:column headerText="Imie">
+                            <h:outputText value="#{c.name}"/>
+                        </p:column>
+                        <p:column headerText="Przypisane etykiety">
+                            <h:outputText rendered="#{empty c.etiquetteCollection}" value="Brak etykiet"/>
+                            <ui:repeat rendered="#{not empty c.etiquetteCollection}" value="#{c.etiquetteCollection}" var="etiquette"></ui:repeat>
+                        </p:column>
+                        <p:column headerText="Dodaj etykiete">
+                            
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>
     </h:body>
 </html>
 

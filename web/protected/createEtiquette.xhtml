@@ -38,16 +38,12 @@
 
         <h:form id="etiquetteForm" class="etiquettteForm">
             <p:panelGrid columns="1" layout="grid" style="margin: 10px auto; width: 100vw;">
-<!--                <p:outputLabel value="Wybierz etykiete: "/>
-                <p:selectOneMenu value="#{myClient.etiquetteName}">
-                    <f:selectItem itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
-                    <f:selectItems value="#{myClient.existingEtiquettes}" var="etiquette" itemValue="#{etiquette.name}" itemLabel="#{etiquette.name}"/>
-                </p:selectOneMenu>-->
                 <p:outputLabel value="Dodaj nową etykiete"/>
-                <p:inputText id="etiquetteName" value="#{myClient.etiquetteNameFromInput}"></p:inputText>
-                            <p:commandButton value="Zapisz etykiete" action="#{myClient.saveEtiquette}"/>
+                <p:inputText id="etiquetteName" value="#{etiquetteManagement.etiquetteName}"></p:inputText>
+                <p:commandButton value="Zapisz etykiete" action="#{etiquetteManagement.saveEtiquette}" update="etiquetteForm" form="etiquetteForm" id="saveEtiquette"/>
 
             </p:panelGrid>
+            <p:messages globalOnly="true" for="saveEtiquette"/>
         </h:form>
     </h:body>
 </html>

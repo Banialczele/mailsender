@@ -31,16 +31,11 @@ public class MyClient implements Serializable {
     private String clientName = "";
     private String clientEmail = "";
     private List<Client> clientList = new ArrayList<Client>();
-    private List<Etiquette> existingEtiquettes = new ArrayList<Etiquette>();
-    private String etiquetteName = "";
-    private String etiquetteNameFromInput = "";
 
     @PostConstruct
     public void init() {
         HttpSession session = SessionUtil.getSession();
         loggedUser = (User) session.getAttribute("user");
-        existingEtiquettes = etiquetteDAO.getAllEtiquettes(loggedUser);
-
     }
 
     public void addClient() {
@@ -53,102 +48,35 @@ public class MyClient implements Serializable {
         return email.matches(regex);
     }
 
-    public void saveEtiquette() {
-        Etiquette newEtiquette = new Etiquette();
-        newEtiquette.setName(etiquetteNameFromInput);
-        newEtiquette.setArchive("Siemaneczko");
-        newEtiquette.setIdUser(loggedUser);
-        try {
-            etiquetteDAO.create(newEtiquette);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
-
     public void saveClient() {
-        List<Etiquette> etiquettes = new ArrayList<Etiquette>();
-        if ("".equals(etiquetteName) && "".equals(etiquetteNameFromInput)) {
-            clientList.forEach(client -> {
-                boolean email = validateEmail(client.getEmail());
-                if (email) {
-                    Client newClient = new Client();
-                    newClient.setName(client.getName());
-                    newClient.setEmail(client.getEmail());
-                    newClient.setIdUser(loggedUser);
-                    newClient.setStatus(1);
-                    try {
-                        clientDAO.create(newClient);
-                        FacesContext ctx = FacesContext.getCurrentInstance();
-                        FacesMessage message = new FacesMessage("Successfully added client " + client.getEmail());
-                        ctx.addMessage("clientForm:saveClients", message);
-                    } catch (Error e) {
-                        throw new Error(e);
-                    }
-                } else if (email != true) {
+        boolean email;
+        Client client;
+        for (Client c : clientList) {
+            email = validateEmail(c.getEmail());
+            client = clientDAO.checkExistanceByEmail(c.getEmail(), loggedUser);
+            if (email && client == null) {
+                Client newClient = new Client();
+                newClient.setName(c.getName());
+                newClient.setEmail(c.getEmail());
+                newClient.setStatus(1);
+                newClient.setIdUser(loggedUser);
+                try {
+                    clientDAO.create(newClient);
                     FacesContext ctx = FacesContext.getCurrentInstance();
-                    FacesMessage message = new FacesMessage("Invalid email, please check email and try again." + client.getEmail());
-                    ctx.addMessage("clientForm:clientEmail", message);
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, null ,"Pomyślnie dodano klienta " + c.getEmail());
+                    ctx.addMessage(null, message);
+                } catch (Error e) {
+                    throw new Error(e);
                 }
-            });
-        } else if (etiquetteName != null) {
-            Etiquette foundLabel = etiquetteDAO.checkExistance(etiquetteName);
-            etiquettes.add(foundLabel);
-            clientList.forEach((client) -> {
-                boolean email = validateEmail(client.getEmail());
-                if (email) {
-                    Client newClient = new Client();
-                    newClient.setName(client.getName());
-                    newClient.setEmail(client.getEmail());
-                    newClient.setIdUser(loggedUser);
-                    newClient.setStatus(1);
-                    newClient.setEtiquetteCollection(etiquettes);
-                    try {
-                        clientDAO.create(newClient);
-                        FacesContext ctx = FacesContext.getCurrentInstance();
-                        FacesMessage message = new FacesMessage("Successfully added client " + client.getEmail());
-                        ctx.addMessage("manageClientsForm:saveClients", message);
-                    } catch (Error e) {
-                        throw new Error(e);
-                    }
-                } else if (email != true) {
-                    FacesContext ctx = FacesContext.getCurrentInstance();
-                    FacesMessage message = new FacesMessage("Invalid email, please check email and try again." + client.getEmail());
-                    ctx.addMessage("manageClientsForm:clientEmail", message);
-                }
-            });
-        } else {
-            Etiquette newEtiquette = new Etiquette();
-            newEtiquette.setName(etiquetteNameFromInput);
-            newEtiquette.setArchive("Siemaneczko");
-            newEtiquette.setIdUser(loggedUser);
-            try {
-                etiquetteDAO.create(newEtiquette);
-                etiquettes.add(newEtiquette);
-            } catch (Exception e) {
-                throw new Error(e);
+            } else if (email == false) {
+                FacesContext ctx = FacesContext.getCurrentInstance();
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, null , "Nieprawidłowy format adresu email " + c.getEmail());
+                ctx.addMessage(null, message);
+            } else if (client != null) {
+                FacesContext ctx = FacesContext.getCurrentInstance();
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, null , "Klient o podanym adresie email " + c.getEmail() + " już istnieje");
+                ctx.addMessage(null, message);
             }
-            clientList.forEach((client) -> {
-                boolean email = validateEmail(client.getEmail());
-                if (email) {
-                    Client newClient = new Client();
-                    newClient.setName(client.getName());
-                    newClient.setEmail(client.getEmail());
-                    newClient.setIdUser(loggedUser);
-                    newClient.setStatus(1);
-                    newClient.setEtiquetteCollection(etiquettes);
-                    try {
-                        clientDAO.create(newClient);
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Dodano klienta", " " + client.getEmail()));
-                    } catch (Error e) {
-                        throw new Error(e);
-                    }
-                } else if (email != true) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid email, please check email and try again." + client.getEmail(), ""));
-                    FacesContext ctx = FacesContext.getCurrentInstance();
-                    FacesMessage message = new FacesMessage();
-                    ctx.addMessage("manageClientsForm:clientEmail", message);
-                }
-            });
         }
     }
 
@@ -179,29 +107,4 @@ public class MyClient implements Serializable {
     public void setClientList(List<Client> clientList) {
         this.clientList = clientList;
     }
-
-    public List<Etiquette> getExistingEtiquettes() {
-        return existingEtiquettes;
-    }
-
-    public void setExistingEtiquettes(List<Etiquette> existingEtiquettes) {
-        this.existingEtiquettes = existingEtiquettes;
-    }
-
-    public String getEtiquetteName() {
-        return etiquetteName;
-    }
-
-    public void setEtiquetteName(String etiquetteName) {
-        this.etiquetteName = etiquetteName;
-    }
-
-    public String getEtiquetteNameFromInput() {
-        return etiquetteNameFromInput;
-    }
-
-    public void setEtiquetteNameFromInput(String etiquetteNameFromInput) {
-        this.etiquetteNameFromInput = etiquetteNameFromInput;
-    }
-
 }

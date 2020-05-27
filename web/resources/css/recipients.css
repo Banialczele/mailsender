@@ -9,6 +9,11 @@ body {
     flex-direction: column;
 }
 
-.ui-datatable-data ui-widget-content{
-    border-style: none !important;
+.ui-tabs .ui-tabs-nav li{
+    float: left !important;
+}
+
+.ui-tabs-panel {
+    clear:both;
+    padding: 2px 0 !important;
 }

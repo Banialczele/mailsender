@@ -13,6 +13,10 @@ body {
     float: none !important;
 }
 
+.ui-menu {
+    border-radius: 10px;
+}
+
 
 .ui-menuitem-icon {
     padding-right: 5px;

@@ -35,25 +35,25 @@
             </p:menubar>
         </h:form>
 
-        <div class="clientContainer">
-            <h:form id="manageClientsForm" style="margin: 0 auto; width: 100vw;">                
-                <c:forEach items="#{myClient.clientList}" var="client">
-                    <p:panelGrid columns="5" style="text-align: center; margin: 5px auto;">
-                        <p:outputLabel value="Nazwa klienta: "/>
-                        <p:inputText id="clientName" value="#{client.name}"></p:inputText>
+        <h:form class="clientContainer"  id="clientsForm" style="margin: 0 auto; width: 100%;">                
+            <c:forEach items="#{myClient.clientList}" var="client">
+                <p:panelGrid columns="6" style="text-align: center; margin: 5px auto;">
+                    <p:outputLabel value="Nazwa klienta: "/>
+                    <p:inputText id="clientName" value="#{client.name}"></p:inputText>
 
-                        <p:outputLabel value="Adres email klienta"/>
-                        <p:inputText id="clientEmail" value="#{client.email}"></p:inputText>
-                        <p:commandButton value="Usuń" action="#{myClient.delete(client)}">
-                            <f:ajax execute="@form" render="manageClientsForm" />
-                        </p:commandButton>
-                    </p:panelGrid>
-                </c:forEach>
-                <p:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true" update="manageClientsForm" />
-                <p:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
-                </p:commandButton><br></br>
-                <h:messages for="saveClients"/>
-            </h:form>
-        </div>
+                    <p:outputLabel value="Adres email klienta"/>
+                    <p:inputText id="clientEmail" value="#{client.email}"></p:inputText>
+                    <p:commandButton value="Usuń" action="#{myClient.delete(client)}">
+                        <f:ajax execute="@form" render="manageClientsForm" />
+                    </p:commandButton>
+                </p:panelGrid>
+            </c:forEach>
+            <p:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true" update="clientsForm" />
+            <p:commandButton id="saveClients" value="Save clients" action="#{myClient.saveClient()}">
+            </p:commandButton><br></br>
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
+        </h:form>
     </h:body>
 </html>

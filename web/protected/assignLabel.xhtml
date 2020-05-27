@@ -39,68 +39,49 @@
             </p:menubar>
         </h:form>
 
-        <h:form id="assignLabelForm">
-            <p:panel>
-                <h:outputText value="Brak klientów bez etykiety" rendered="#{empty assignLabel.clientList}" />
-                <p:dataTable value="#{assignLabel.clientList}" 
-                             rendered="#{not empty assignLabel.clientList}"
-                             var="client" 
-                             paginator="true" 
-                             rows="10" 
-                             rowsPerPageTemplate="5,10,15,20,50"    
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"                         
-                             >
-                    <f:facet name="header">
-                        Lista nieprzypisanych klientów                    
-                    </f:facet>
-                    <p:column headerText="Nazwa klienta" sortBy="#{client.name}">
-                        <h:outputText value="#{client.name}"/>
-                    </p:column>
-                    <p:column headerText="Email klienta">
-                        <h:outputText value="#{client.email}"/>
-                    </p:column>
-                    <p:column headerText="Szczegóły">
-                        <p:commandButton value="#{client.name}" oncomplete="PF('clientDialog').show();" ajax="true" update="dialog">
-                            <f:setPropertyActionListener value="#{client}" target="#{assignLabel.selectedClient}" />
-                        </p:commandButton>
-                    </p:column>
-                    <p:column headerText="Przypisz etykiete">
-                        <p:commandButton value="Wybierz etykiete" oncomplete="PF('selectEtiquette').show();" ajax="true" update="selectEtiquette">
-                            <f:setPropertyActionListener value="#{client}" target="#{assignLabel.selectedClient}" />
-                        </p:commandButton>
-                    </p:column>
-                </p:dataTable> 
-            </p:panel>
-        </h:form>
+        <p:tabView id="mainView">
+            <p:tab title="Klienci bez etykiety">
+                <h:form id="assignLabelForm">
+                    <p:panel id="assignLabelPanelId">
+                        <p:dataTable value="#{etiquetteManagement.clientList}"
+                                     var="client" 
+                                     paginator="true" 
+                                     rows="10" 
+                                     rowsPerPageTemplate="5,10,15,20,50"    
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     >
+                            <p:column headerText="Nazwa klienta">
+                                <h:outputText value="#{client.name}"/>
+                            </p:column>
+                            <p:column headerText="Email klienta">
+                                <h:outputText value="#{client.email}"/>
+                            </p:column>
+                            <p:column headerText="Przypisz etykiete">
+                                <p:commandButton value="Wybierz etykiete" oncomplete="PF('selectEtiquette').show();" ajax="true">
+                                    <f:setPropertyActionListener value="#{client}" target="#{etiquetteManagement.selectedClient}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable> 
+                    </p:panel>
+                </h:form> 
+                <h:form id="selectEtiquette">
+                    <p:dialog header="Wybierz etykiete z listy" widgetVar="selectEtiquette" minHeight="40" minWidth="50" id="etiquetteId">
+                        <p:selectOneMenu value="#{etiquetteManagement.etiquetteName}" dynamic="true" required="true">
+                            <f:selectItem itemLabel="Wybierz jedną z listy " itemValue="" />      
+                            <f:selectItems value="#{etiquetteManagement.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton value="Zapisz" 
+                                         action="#{etiquetteManagement.updateClient()}"   
+                                         />
+                        <p:ajax event="close" update=":mainView:assignLabelForm"/>
 
-        <h:form id="dialog">
-            <p:dialog header="O kliencie #{assignLabel.selectedClient.name}" widgetVar="clientDialog" minHeight="40" >
-                <p:panelGrid columns="3">
-                    <h:outputText value="Email"/>
-                    <h:outputText value="Etykieta"/>
-                    <h:outputText value="Status"/>
+                    </p:dialog>
+                </h:form>
+            </p:tab>
+            <p:tab title="Klienci posiadający etykiete">
 
-                    <h:outputText value="#{assignLabel.selectedClient.email}"/>
-                    <h:outputText rendered="#{empty assignLabel.etiquetteList}" value="Brak przypisanej etykiety"/>
-                    <h:outputText value="#{assignLabel.selectedClient.status == '1' ? 'aktywny' : 'nieaktywny'}"/>
-                </p:panelGrid>
-            </p:dialog>
-        </h:form>
-
-        <h:form id="selectEtiquette">
-            <p:dialog header="Wybierz etykiete z listy" widgetVar="selectEtiquette" minHeight="40" minWidth="50" id="etiquetteId">
-                <p:selectOneMenu value="#{assignLabel.etiquette}" dynamic="true" required="true">
-                    <f:selectItem itemLabel="Wybierz jedną z listy " itemValue="" />      
-                    <f:selectItems value="#{assignLabel.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
-                </p:selectOneMenu>
-                <p:commandButton value="Zapisz" 
-                                 action="#{assignLabel.updateClient()}" 
-                                 update="@form"                                  
-                                 process="@form :selectEtiquette"
-                                 onclick="PF('selectEtiquette').hide();"      
-                                 />
-            </p:dialog>
-        </h:form>
+            </p:tab>
+        </p:tabView>
     </h:body>
 </html>
 

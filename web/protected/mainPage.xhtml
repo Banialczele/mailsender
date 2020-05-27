@@ -3,7 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
@@ -38,61 +40,64 @@
             </p:menubar>
         </h:form>
 
-        <h:form id="mainPageForm" style="width: 100%; ">
-            <p:panel>
-                <h:outputText value="Brak mailingu" rendered="#{empty mailMessages.messageList}" />
-                <p:dataTable value="#{mailMessages.messageList}"
-                             rendered="#{not empty mailMessages.messageList}"
-                             var="message"
-                             paginator="true" 
-                             rows="5"
-                             rowsPerPageTemplate="5,10,15,20,50" 
-                             widgetVar="messageTable"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                             id="messegeRecords"
-                             filteredValue="#{mailMessages.filteredMails}"
-                             emptyMessage="No messages found with given criteria"
-                             globalFilterFunction="#{mailMessages.globalFilterFunction}"
-                             >
-                    <f:facet name="header">
-                        <p:outputPanel>
-                            <h:outputText value="Znajdź wiadomość:" />
-                            <p:inputText id="globalFilter" onkeyup="PF('messageTable').filter()" style="width:150px" placeholder="Enter keyword"/>
-                        </p:outputPanel>
-                    </f:facet>
-
-                    <p:column headerText="Temat" sortBy="#{message.messageTopic}">
-                        <h:outputText value="#{message.messageTopic}"/>
-                    </p:column>
-                    <p:column headerText="Szczegóły">
-                        <p:commandButton value="Szczegóły" oncomplete="PF('details').show();" update=":dialog" ajax="true" >
-                            <f:setPropertyActionListener value="#{message}" target="#{mailMessages.selectedMail}" />  
-                        </p:commandButton>
-                    </p:column>       
-                    <p:column headerText="Wyslij ponownie">
-                        <p:commandButton value="Wyślij ponownie" action="#{mailSend.sendMessage(message)}"/>            
-                        <p:messages id="messages" for="groupsForm" globalOnly="true" showDetail="true" closable="true">
-                            <p:autoUpdate />
-                        </p:messages>
-                    </p:column> 
-                </p:dataTable> 
-            </p:panel>
-        </h:form>
-        <h:form id="dialog">            
-            <p:dialog id="myDialog" header="Wiadomość: #{mailMessages.selectedMail.messageTopic}" widgetVar="details">
-                <p:panelGrid columns="2">
-                    <h:outputText value="Temat wiadomości: "/>
-                    <h:outputText value="#{mailMessages.selectedMail.messageTopic}"/>
-
-                    <h:outputText value="Wiadomość: "/>
-                    <h:outputText value="#{mailMessages.selectedMail.messageContent}"/>
-
-                    <h:outputText value="Data wysłania: "/>
-                    <h:outputText value="#{mailMessages.selectedMail.date}" />
-                </p:panelGrid>
-            </p:dialog>
-        </h:form>
+        <p:tabView cache="false" dynamic="true">
+            <p:tab title="Wiadomość">
+                <h:form>
+                    <h:outputText value="Brak mailingu" rendered="#{empty mailMessages.messageList}" />
+                    <p:dataTable value="#{mailMessages.messageList}"
+                                 rendered="#{not empty mailMessages.messageList}"
+                                 var="message"
+                                 paginator="true"
+                                 lazy="true"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,15,20,50" 
+                                 widgetVar="messageTable"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                                 >
+                        <p:column headerText="Temat">
+                            <h:outputText value="#{message.messageTopic}"/>
+                        </p:column>
+                        <p:column headerText="Data">
+                            <h:outputText value="#{message.date}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy hh:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Wyslij ponownie">
+                            <p:commandButton value="Wyślij ponownie" action="#{mailSend.sendMessage(message)}"/>  
+                            <p:messages id="messages" for="groupsForm" globalOnly="true" showDetail="true" closable="true">
+                                <p:autoUpdate />
+                            </p:messages>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+            <p:tab title="Szczegóły">
+                <h:form>
+                    <h:outputText value="Brak mailingu" rendered="#{empty mailMessages.messageList}" />
+                    <p:dataTable value="#{mailMessages.messageList}"
+                                 rendered="#{not empty mailMessages.messageList}"
+                                 var="message"
+                                 paginator="true"
+                                 lazy="true"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,15,20,50" 
+                                 widgetVar="messageTable"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                                 >
+                        <p:column headerText="Temat">
+                            <h:outputText value="#{message.messageTopic}"/>
+                        </p:column>
+                        <p:column headerText="Treść wiadomości">
+                            <h:outputText value="#{message.messageContent}"/>
+                        </p:column>
+                        <p:column headerText="Lista etykiet">
+                        </p:column>                        
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>    
     </h:body>
 </html>
 
