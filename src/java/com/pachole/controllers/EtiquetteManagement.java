@@ -7,26 +7,26 @@ import com.pachole.serviceDAO.ClientFacade;
 import com.pachole.serviceDAO.EtiquetteFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 @Named
-@RequestScoped
-public class EtiquetteManagement implements Serializable{
+@ViewScoped
+public class EtiquetteManagement implements Serializable {
 
     private User loggedUser;
-    private List<Client> clientList;
+    private List<Client> clientsWithoutLabel;
+    private List<Client> clientsWithLabel;
     private List<Etiquette> etiquetteList;
+    private Etiquette chosenEtiquette;
     private static Client selectedClient;
     private String etiquetteName;
-    private Etiquette choosenEtiquette;
 
     @Inject
     private ClientFacade clientDAO;
@@ -38,23 +38,24 @@ public class EtiquetteManagement implements Serializable{
     public void init() {
         HttpSession session = SessionUtil.getSession();
         loggedUser = (User) session.getAttribute("user");
-        clientList = clientDAO.findClientsWithoutLabel(loggedUser);
+        clientsWithoutLabel = clientDAO.findClientsWithoutLabel(loggedUser);
+    }
+
+    public List<Client> showClients() {
+        clientsWithLabel = clientDAO.findClientsWithLabel(loggedUser);
+        return clientsWithLabel;
     }
 
     public void updateClient() {
-        choosenEtiquette = etiquetteDAO.findByName(etiquetteName);
-        List<Etiquette> etiquetteList = new ArrayList<Etiquette>();
-        etiquetteList.add(choosenEtiquette);
-        selectedClient.setEtiquetteCollection(etiquetteList);
+        chosenEtiquette = etiquetteDAO.findByName(etiquetteName);
+        List<Etiquette> updateLabelList;
+        updateLabelList = (List<Etiquette>) selectedClient.getEtiquetteCollection();
+        updateLabelList.add(chosenEtiquette);        
         clientDAO.edit(selectedClient);
     }
 
     public List<Etiquette> findAllEtiquettes() {
-        try {
-            etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
+        etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
         return etiquetteList;
     }
 
@@ -86,12 +87,12 @@ public class EtiquetteManagement implements Serializable{
         }
     }
 
-    public List<Client> getClientList() {
-        return clientList;
+    public List<Client> getClientsWithoutLabel() {
+        return clientsWithoutLabel;
     }
 
-    public void setClientList(List<Client> clientList) {
-        this.clientList = clientList;
+    public void setClientsWithoutLabel(List<Client> clientsWithoutLabel) {
+        this.clientsWithoutLabel = clientsWithoutLabel;
     }
 
     public Client getSelectedClient() {
@@ -108,6 +109,22 @@ public class EtiquetteManagement implements Serializable{
 
     public void setEtiquetteName(String etiquetteName) {
         this.etiquetteName = etiquetteName;
+    }
+
+    public List<Client> getClientsWithLabel() {
+        return clientsWithLabel;
+    }
+
+    public void setClientsWithLabel(List<Client> clientsWithLabel) {
+        this.clientsWithLabel = clientsWithLabel;
+    }
+
+    public Etiquette getChosenEtiquette() {
+        return chosenEtiquette;
+    }
+
+    public void setChosenEtiquette(Etiquette chosenEtiquette) {
+        this.chosenEtiquette = chosenEtiquette;
     }
 
 }

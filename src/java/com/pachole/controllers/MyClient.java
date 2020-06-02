@@ -24,9 +24,6 @@ public class MyClient implements Serializable {
     @Inject
     private ClientFacade clientDAO;
 
-    @Inject
-    private EtiquetteFacade etiquetteDAO;
-
     private User loggedUser;
     private String clientName = "";
     private String clientEmail = "";

@@ -14,6 +14,7 @@ import com.pachole.serviceDAO.MailstatusFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,42 +70,48 @@ public class MailSend implements Serializable {
         mailAccount = accountDAO.getMailAccount();
     }
 
-    public void useMail(Mail message) {
-        selectedMail = message;
-    }
-
     public List<String> showNamesList(String query) {
         String queryToLowerCase = query.toLowerCase();
         List<String> allLabels = new ArrayList<String>();
         for (Etiquette e : etiquetteList) {
             allLabels.add(e.getName());
         }
-
         return allLabels.stream().filter(name -> name.toLowerCase().contains(queryToLowerCase)).collect(Collectors.toList());
     }
 
-    public void sendMessage(Mail selectedMessage) throws MessagingException {
-        if (selectedMessage == null) {
-            clientData = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
-            etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
+    public List<Client> messageClients(List<String> etiquetteName) {
+        List<Client> clients = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
+        List<Client> clientsWithoutDuplicates = new ArrayList<>();
+        clients.stream().filter((c) -> (!clientsWithoutDuplicates.contains(c))).forEachOrdered((c) -> {
+            clientsWithoutDuplicates.add(c);
+        });
+        return clientsWithoutDuplicates;
+    }
 
-            String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
-            DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-            Date currentDay = new Date();
+    public List<Etiquette> messageEtiquettes(List<String> etiquetteName) {
+        List<Etiquette> etiquettes = etiquetteDAO.findByEtiquetteName(etiquetteName);
+        return etiquettes;
+    }
+
+    public void sendMessage(Mail selectedMessage) throws MessagingException, ParseException {
+        String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
+        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm");
+        Date dateobj = new Date();
+        System.out.println();
+        
+        if (selectedMessage == null) {
+            clientData = messageClients(etiquetteName);
+            etiquetteCollection = messageEtiquettes(etiquetteName);
         } else if (selectedMessage != null) {
             topic = selectedMessage.getMessageTopic();
             content = selectedMessage.getMessageContent();
             for (Etiquette e : selectedMessage.getEtiquetteCollection()) {
                 etiquetteName.add(e.getName());
             }
-            clientData = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
-            etiquetteCollection = etiquetteDAO.findByEtiquetteName(etiquetteName);
-
+            clientData = messageClients(etiquetteName);
+            etiquetteCollection = messageEtiquettes(etiquetteName);
         }
 
-        String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        Date currentDay = new Date();
         Properties prop = new Properties();
 
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -123,17 +130,18 @@ public class MailSend implements Serializable {
         System.out.println("Trying to send an email");
 
         Mail emailMessage;
-        Mailstatus emailStatus = new Mailstatus();
+        Mailstatus emailStatus;
         for (Client client : clientData) {
             if (client.getStatus() == 1) {
                 try {
                     receiver = client.getEmail();
                     emailMessage = new Mail();
+                    emailStatus = new Mailstatus();
 
                     emailMessage.setReceiver(receiver.trim());
                     emailMessage.setMessageContent(content.trim());
                     emailMessage.setMessageTopic(topic.trim());
-                    emailMessage.setDate(df.format(currentDay));
+                    emailMessage.setDate(df.parse(df.format(dateobj)));
                     emailMessage.setAuthorName(author);
                     emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
                     emailMessage.setIdUser(loggedUser);
@@ -145,7 +153,7 @@ public class MailSend implements Serializable {
                             e.getMailCollection().add(emailMessage);
                             etiquetteDAO.updateEtiquetteMailCollection(e);
 
-                            emailStatus.setDate(df.format(currentDay));
+                            emailStatus.setDate(df.parse(df.format(dateobj)));
                             emailStatus.setMailStatus("0");
                             emailStatus.setStatus("0");
                             emailStatus.setIdClient(client);
@@ -154,7 +162,6 @@ public class MailSend implements Serializable {
                             statusDAO.create(emailStatus);
                         }
                     } catch (Exception e) {
-
                         throw new Error(e);
                     }
 
@@ -166,17 +173,15 @@ public class MailSend implements Serializable {
                     Transport.send(message);
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Pomyślnie wysłano wiadomość ", " " + message));
 
-                    emailStatus.setDate(df.format(currentDay));
+                    emailStatus.setDate(df.parse(df.format(dateobj)));
                     emailStatus.setMailStatus("1");
                     emailStatus.setStatus("1");
                     emailStatus.setIdClient(client);
                     emailStatus.setIdMail(emailMessage);
                     emailStatus.setIdMailAccounts(mailAccount);
                     statusDAO.update(emailStatus);
-
                 } catch (AddressException ex) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udało się wysłać wiadomości", ""));
-
                     Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -230,14 +235,6 @@ public class MailSend implements Serializable {
 
     public void setEtiquetteName(List<String> etiquetteName) {
         this.etiquetteName = etiquetteName;
-    }
-
-    public Mail getSelectedMail() {
-        return selectedMail;
-    }
-
-    public void setSelectedMail(Mail selectedMail) {
-        this.selectedMail = selectedMail;
     }
 
 }

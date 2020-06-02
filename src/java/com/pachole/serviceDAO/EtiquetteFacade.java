@@ -44,6 +44,16 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         getEntityManager().remove(getEntityManager().merge(etiquette));
     }
 
+    public List<Etiquette> findListBySubstring(String name) {
+        List<Etiquette> result;
+        try {
+            result = getEntityManager().createQuery("SELECT e FROM Etiquette e WHERE (lower(e.name) LIKE CONCAT('%',:name,'%'))", Etiquette.class).setParameter("name", name).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
+
     public Etiquette findByName(String name) {
         Etiquette result;
         try {
@@ -53,7 +63,7 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
         }
         return result;
     }
-    
+
     public List<Etiquette> findByEtiquetteName(List<String> name) {
         List<Etiquette> result = new ArrayList<Etiquette>();
         try {

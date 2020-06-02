@@ -8,3 +8,7 @@ body {
     align-items: center;
     flex-direction: column;
 }
+
+.hover:hover {
+    background: rgba(35,35,35, 0.2);
+}

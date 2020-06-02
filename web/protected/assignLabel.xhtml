@@ -9,6 +9,7 @@
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
         <h:outputStylesheet name="css/mainPage.css"/>
+        <h:outputStylesheet name="css/floatTabs.css"/>
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
@@ -41,10 +42,13 @@
 
         <p:tabView id="mainView">
             <p:tab title="Klienci bez etykiety">
-                <h:form id="assignLabelForm">
+                <h:form id="clientsWithoutEtiquette">
                     <p:panel id="assignLabelPanelId">
-                        <p:dataTable value="#{etiquetteManagement.clientList}"
-                                     var="client" 
+                        <h:outputText value="Brak klientów nie posiadających etykiety" rendered="#{empty etiquetteManagement.clientsWithoutLabel}"/>
+                        <p:dataTable value="#{etiquetteManagement.clientsWithoutLabel}"
+                                     rendered="#{not empty etiquetteManagement.clientsWithoutLabel}"
+                                     var="client"
+                                     lazy="true"
                                      paginator="true" 
                                      rows="10" 
                                      rowsPerPageTemplate="5,10,15,20,50"    
@@ -72,14 +76,39 @@
                         </p:selectOneMenu>
                         <p:commandButton value="Zapisz" 
                                          action="#{etiquetteManagement.updateClient()}"   
+                                         update="@form"
                                          />
-                        <p:ajax event="close" update=":mainView:assignLabelForm"/>
-
                     </p:dialog>
                 </h:form>
             </p:tab>
             <p:tab title="Klienci posiadający etykiete">
-
+                <h:form id="clientsWithEtiquette">
+                    <p:dataTable value="#{etiquetteManagement.showClients()}" 
+                                 var="client"
+                                 lazy="true"
+                                 paginator="true"
+                                 rows="10"
+                                 >
+                        <p:column headerText="Nazwa klienta">
+                            <h:outputText value="#{client.name}" />
+                        </p:column>
+                        <p:column headerText="Email">
+                            <h:outputText value="#{client.email}" />
+                        </p:column>
+                        <p:column headerText="Dodaj etykiete">
+                            <p:commandButton value="Dodaj" id="addEtiquette"/>
+                            <p:overlayPanel for="addEtiquette" dynamic="true">
+                                <p:selectOneMenu value="#{etiquetteManagement.etiquetteName}" dynamic="true">
+                                    <f:selectItem itemLabel="Wybierz etykiete " itemValue="#{null}"/>
+                                    <f:selectItems value="#{etiquetteManagement.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
+                                </p:selectOneMenu>
+                                <p:commandButton value="Zapisz" action="#{etiquetteManagement.updateClient()}" process="@parent" update="@parent">
+                                    <f:setPropertyActionListener target="#{etiquetteManagement.selectedClient}" value="#{client}"/>
+                                </p:commandButton>
+                            </p:overlayPanel>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
             </p:tab>
         </p:tabView>
     </h:body>

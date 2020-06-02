@@ -7,23 +7,15 @@ import com.pachole.serviceDAO.ClientFacade;
 import com.pachole.serviceDAO.EtiquetteFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import org.primefaces.event.ToggleEvent;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
-import org.primefaces.event.CellEditEvent;
 
 @Named
-@ViewScoped
+@RequestScoped
 public class ShowClients implements Serializable {
 
     @Inject
@@ -32,10 +24,18 @@ public class ShowClients implements Serializable {
     @Inject
     private EtiquetteFacade etiquetteDAO;
 
-    private List<Client> clientList = new ArrayList<Client>();
+    private List<Client> clientList;
+
     private List<Etiquette> etiquetteList;
+    private Etiquette selectedEtiquette;
+
     private User loggedUser;
-    private Client showClientDetails;
+
+    private String searchString;
+    private String name;
+    private String status;
+    private String email;
+    private boolean showTable = false;
 
     @PostConstruct
     public void init() {
@@ -45,34 +45,26 @@ public class ShowClients implements Serializable {
     }
 
     public void delete(Client client) {
-        System.out.println(client);
         etiquetteList.forEach(etiquette -> {
-            System.out.println("przed: " + etiquette.getClientCollection());
             etiquette.getClientCollection().remove(client);
-            System.out.println("po: " + etiquette.getClientCollection());
         });
         clientDAO.remove(client);
     }
 
-    public void onCellEdit(CellEditEvent event) {
-        Object oldValue = event.getOldValue();
-        Object newValue = event.getNewValue();
-        FacesContext context = FacesContext.getCurrentInstance();
-        Client client = context.getApplication().evaluateExpressionGet(context, "#{client}", Client.class);
-
-        if (newValue != null && !newValue.equals(oldValue)) {
-            client.setStatus((int) newValue);
-            try {
-                clientDAO.edit(client);
-            } catch(Exception e){
-                throw new Error(e);
-            }
-        }
+    public List<Etiquette> filterEtiquettes() {
+        etiquetteList = etiquetteDAO.findListBySubstring(searchString);
+        return etiquetteList;
     }
 
-    public void onToggle(ToggleEvent event) {
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, event.getComponent().getId() + " toggled", "Status:" + event.getVisibility().name());
-        FacesContext.getCurrentInstance().addMessage("groupsForm:msgs", message);
+    public List<Client> clientsForChosenLabel() {
+        showTable = true;
+        clientList = clientDAO.findClientsByEtiquette(selectedEtiquette.getName());
+        return clientList;
+    }
+
+    public List<Client> filterClients() {
+        clientList = clientDAO.filterClientsByData(name, email, status);
+        return clientList;
     }
 
     public List<Client> getClientList() {
@@ -91,12 +83,52 @@ public class ShowClients implements Serializable {
         this.etiquetteList = etiquetteList;
     }
 
-    public Client getShowClientDetails() {
-        return showClientDetails;
+    public Etiquette getSelectedEtiquette() {
+        return selectedEtiquette;
     }
 
-    public void setShowClientDetails(Client showClientDetails) {
-        this.showClientDetails = showClientDetails;
+    public void setSelectedEtiquette(Etiquette selectedEtiquette) {
+        this.selectedEtiquette = selectedEtiquette;
+    }
+
+    public boolean isShowTable() {
+        return showTable;
+    }
+
+    public void setShowTable(boolean showTable) {
+        this.showTable = showTable;
+    }
+
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }

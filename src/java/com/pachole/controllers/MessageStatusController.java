@@ -32,16 +32,6 @@ public class MessageStatusController {
         messageList = statusDAO.getMailAndClientEmail(loggedUser);
     }
 
-    public boolean globalFilterFunction(Object value, Object filter, Locale locale) {
-        String filterText = (filter == null) ? null : filter.toString().trim().toLowerCase();
-        if (filterText == null || filterText.equals("")) {
-            return true;
-        }
-
-        Mailstatus mailStatus = (Mailstatus) value;
-        return mailStatus.getIdMail().getMessageTopic().toLowerCase().contains(filterText) || mailStatus.getDate().contains(filterText) || mailStatus.getIdClient().getEmail().toLowerCase().contains(filterText);
-    }
-
     public List<Mailstatus> getMessageList() {
         return messageList;
     }

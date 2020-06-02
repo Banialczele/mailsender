@@ -8,6 +8,7 @@ package com.pachole.entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -63,13 +64,13 @@ public class Mail implements Serializable {
     private String messageTopic;
     @Basic(optional = false)
     @Column(name = "date")
-    private String date;
+    private Date date;
     @Basic(optional = false)
     @Column(name = "authorName")
     private String authorName;
     @ManyToMany(mappedBy = "mailCollection")
-    private Collection<Etiquette> etiquetteCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMail",orphanRemoval = true)
+    private Collection<Etiquette> etiquetteCollection = new ArrayList<Etiquette>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idMail", orphanRemoval = true)
     private Collection<Mailstatus> mailstatusCollection;
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     @ManyToOne(optional = false)
@@ -82,7 +83,7 @@ public class Mail implements Serializable {
         this.idMail = idMail;
     }
 
-    public Mail(Integer idMail, String receiver, String messageContent, String messageTopic, String date, String authorName) {
+    public Mail(Integer idMail, String receiver, String messageContent, String messageTopic, Date date, String authorName) {
         this.idMail = idMail;
         this.receiver = receiver;
         this.messageContent = messageContent;
@@ -123,11 +124,11 @@ public class Mail implements Serializable {
         this.messageTopic = messageTopic;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

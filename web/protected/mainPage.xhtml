@@ -10,6 +10,7 @@
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
         <h:outputStylesheet name="css/mainPage.css"/>
+        <h:outputStylesheet name="css/floatTabs.css"/>
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
@@ -60,7 +61,7 @@
                         </p:column>
                         <p:column headerText="Data">
                             <h:outputText value="#{message.date}">
-                                <f:convertDateTime type="date" pattern="dd-MM-yyyy hh:mm"/>
+                                <f:convertDateTime pattern="d/MM/yyyy HH:mm" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Wyslij ponownie">
@@ -93,6 +94,10 @@
                             <h:outputText value="#{message.messageContent}"/>
                         </p:column>
                         <p:column headerText="Lista etykiet">
+                            <h:outputText rendered="#{empty message.etiquetteCollection}" value="Brak etykiet"/>
+                            <ui:repeat rendered="#{not empty message.etiquetteCollection}" value="#{message.etiquetteCollection}" var="etiquette">
+                                <h:outputText style="background: rgb(0, 115, 255); color:white; padding: 3px 15px; border-radius: 5px; margin: 0 5px;" value="#{etiquette.name} "/>
+                            </ui:repeat>
                         </p:column>                        
                     </p:dataTable>
                 </h:form>

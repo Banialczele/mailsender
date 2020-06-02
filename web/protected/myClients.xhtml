@@ -8,7 +8,8 @@
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
-        <h:outputStylesheet name="css/recipients.css"/>
+        <h:outputStylesheet name="css/myClients.css"/>
+        <h:outputStylesheet name="css/floatTabs.css"/>
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
@@ -37,7 +38,7 @@
 
         <p:tabView dynamic="true" cache="false">
             <p:tab title="Lista klientów" id="clientTab">
-                <h:form id="ClientsForm">
+                <h:form id="clientsForm">
                     <p:dataTable id="groupTable" 
                                  class="groupTable" 
                                  value="#{displayClients.clientList}" 
@@ -46,18 +47,28 @@
                                  paginator="true" 
                                  rows="10"
                                  lazy="true"
+                                 editable="true"
+                                 editMode="cell"
                                  rowsPerPageTemplate="5,10,15,20,50"    
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"                         
                                  >
+                        <p:ajax event="cellEdit" listener="#{displayClients.onCellEdit}" update="groupTable" />
                         <p:column headerText="Imie">
                             <h:outputText value="#{c.name}"/>
                         </p:column>                
                         <p:column headerText="Email">
                             <h:outputText value="#{c.email}"/>
                         </p:column>
-                        <p:column headerText="Status">
-                            <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
+                        <p:column headerText="Status" class="hover">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText value="#{c.status}" label="status" />
+                                </f:facet>
+                            </p:cellEditor>
                         </p:column>                
                         <p:column headerText="Usuń">
                             <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="@form"/>
@@ -85,10 +96,9 @@
                         </p:column>
                         <p:column headerText="Przypisane etykiety">
                             <h:outputText rendered="#{empty c.etiquetteCollection}" value="Brak etykiet"/>
-                            <ui:repeat rendered="#{not empty c.etiquetteCollection}" value="#{c.etiquetteCollection}" var="etiquette"></ui:repeat>
-                        </p:column>
-                        <p:column headerText="Dodaj etykiete">
-                            
+                            <ui:repeat rendered="#{not empty c.etiquetteCollection}" value="#{c.etiquetteCollection}" var="etiquette">
+                                <h:outputText style="background: rgb(0, 115, 255); color:white; padding: 3px 15px; border-radius: 5px; margin: 0 5px;" value="#{etiquette.name} "/>
+                            </ui:repeat>
                         </p:column>
                     </p:dataTable>
                 </h:form>

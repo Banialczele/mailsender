@@ -44,8 +44,8 @@
                     <p:outputLabel value="Adres email klienta"/>
                     <p:inputText id="clientEmail" value="#{client.email}"></p:inputText>
                     <p:commandButton value="Usuń" action="#{myClient.delete(client)}">
-                        <f:ajax execute="@form" render="manageClientsForm" />
-                    </p:commandButton>
+                        <f:ajax render="clientsForm" execute="@this" />
+                    </p:commandButton> 
                 </p:panelGrid>
             </c:forEach>
             <p:commandButton value="Add client" action="#{myClient.addClient()}" immediate="true" update="clientsForm" />

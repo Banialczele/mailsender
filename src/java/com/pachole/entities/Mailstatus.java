@@ -6,6 +6,7 @@
 package com.pachole.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,7 +49,7 @@ public class Mailstatus implements Serializable {
     private String status;
     @Basic(optional = false)
     @Column(name = "date")
-    private String date;
+    private Date date;
     @Basic(optional = false)
     @Column(name = "mailStatus")
     private String mailStatus;
@@ -69,7 +70,7 @@ public class Mailstatus implements Serializable {
         this.idMailStatus = idMailStatus;
     }
 
-    public Mailstatus(Integer idMailStatus, String status, String date, String mailStatus) {
+    public Mailstatus(Integer idMailStatus, String status, Date date, String mailStatus) {
         this.idMailStatus = idMailStatus;
         this.status = status;
         this.date = date;
@@ -92,11 +93,11 @@ public class Mailstatus implements Serializable {
         this.status = status;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
