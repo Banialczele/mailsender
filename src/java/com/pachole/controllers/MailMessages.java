@@ -5,6 +5,10 @@ import com.pachole.entities.User;
 import com.pachole.serviceDAO.MailFacade;
 import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
@@ -14,7 +18,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 @Named("mailMessages")
-@RequestScoped
+@ViewScoped
 public class MailMessages implements Serializable {
 
     @Inject
@@ -22,12 +26,32 @@ public class MailMessages implements Serializable {
 
     private List<Mail> messageList;
     private User loggedUser;
+    private String author;
+    private Date date;
+    private String topic;
+    private String receiver;
 
     @PostConstruct
     public void init() {
         HttpSession session = SessionUtil.getSession();
         loggedUser = (User) session.getAttribute("user");
         messageList = mailDAO.findByLoggedUser(loggedUser);
+    }
+    
+    public List<Mail> resetFilter(){
+        messageList = mailDAO.findByLoggedUser(loggedUser);
+        return messageList;
+    }
+
+    public List<Mail> filterMails() throws ParseException {
+        if (date != null) {
+            SimpleDateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm");
+            Date dataObj = df.parse(df.format(date));
+            messageList = mailDAO.filterMails(author, dataObj, topic, receiver, loggedUser);
+        } else {
+            messageList = mailDAO.filterMailsWithoutDate(author, topic, receiver, loggedUser);
+        }
+        return messageList;
     }
 
     public List<Mail> getMessageList() {
@@ -45,4 +69,37 @@ public class MailMessages implements Serializable {
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
     }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
 }

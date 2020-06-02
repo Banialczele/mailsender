@@ -46,18 +46,7 @@
                              rowsPerPageTemplate="5,10,15,20,50"                                         
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                              currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                             filteredValue="#{messageError.controller.filteredList}"
-                             emptyMessage="No messages found with given criteria"
-                             globalFilterFunction="#{messageError.controller.globalFilterFunction}"
-                             widgetVar="failedList"
-                             > 
-                    <f:facet name="header">
-                        <p:outputPanel>
-                            <h:outputText value="Filtruj wiadomości:" />
-                            <p:inputText id="globalFilter" onkeyup="PF('failedList').filter()" style="width:150px" placeholder="Enter keyword"/>
-                        </p:outputPanel>
-                    </f:facet>
-                    
+                             >                     
                     <p:column headerText="Adres email">
                         #{e.idClient.email}
                     </p:column>

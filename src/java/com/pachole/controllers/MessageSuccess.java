@@ -30,7 +30,6 @@ public class MessageSuccess implements Serializable {
     @PostConstruct
     public void init() {
         messageList = controller.getMessageList();
-        System.out.println("Lista wiadomości: " + messageList);
         for (Mailstatus m : messageList) {
             if (m.getStatus().equals("1")) {
                 successfulList.add(m);

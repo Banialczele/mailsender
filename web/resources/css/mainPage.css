@@ -9,14 +9,11 @@ body {
     font-size: 20px;
 }
 
-.ui-widget-content {
-    border: none;
-}
-
-.ui-panelgrid {
-    border: none;
-}
-
 .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
     border-style: none !important;
+}
+
+.searchMail .ui-widget-content td {
+    padding: 10px 0;
+    border: 1px solid red;
 }

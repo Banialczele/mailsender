@@ -41,13 +41,32 @@
             </p:menubar>
         </h:form>
 
-        <p:tabView cache="false" dynamic="true">
-            <p:tab title="Wiadomość">
-                <h:form>
+        <p:fieldset legend="Wyszukaj" toggleable="true" toggleSpeed="500" collapsed="true" style="margin: 25px 0;">            
+            <h:form>
+                <p:panelGrid columns="2" styleClass="ui-noborder searchMail">
+                    <h:outputText value="Wpisz temat"/>
+                    <p:inputText value="#{mailMessages.topic}" placeholder="Wprowadź temat"/>
+                    <h:outputText value="Wprowadź datę"/>
+                    <p:datePicker value="#{mailMessages.date}" id="timeDe" showIcon="true" showTime="true" locale="pl" pattern="d/MM/yyyy HH:mm"/>
+                    <h:outputText value="Wprowadź autora"/>
+                    <p:inputText value="#{mailMessages.author}" placeholder="Autor"/>
+                    <h:outputText value="Wprowadź adres odbiorcy"/>
+                    <p:inputText value="#{mailMessages.receiver}" placeholder="adres odbiorcy"/>
+                    <p:commandButton value="Wyszukaj" action="#{mailMessages.filterMails()}" process="@form" update=":mailView" />
+                    <p:commandButton value="Resetuj filtry" action="#{mailMessages.resetFilter()}" process="@form" update=":mailView" />
+                </p:panelGrid>
+
+            </h:form>
+        </p:fieldset>
+
+        <p:tabView cache="false" dynamic="true" id="mailView">
+            <p:tab title="Wiadomość" >
+                <h:form id="mailForm">
                     <h:outputText value="Brak mailingu" rendered="#{empty mailMessages.messageList}" />
                     <p:dataTable value="#{mailMessages.messageList}"
                                  rendered="#{not empty mailMessages.messageList}"
                                  var="message"
+                                 id="mailData"
                                  paginator="true"
                                  lazy="true"
                                  rows="5"

@@ -41,14 +41,12 @@
                              var="p" 
                              rendered="#{not empty messageQueued.queuedList}"
                              paginator="true" 
+                             lazy="true"
                              rows="5"
                              widgetVar="queuedList"
                              rowsPerPageTemplate="5,10,15,20,50"                                         
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                              currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                             filteredValue="#{messageQueued.controller.filteredList}"
-                             emptyMessage="No messages found with given criteria"
-                             globalFilterFunction="#{messageQueued.controller.globalFilterFunction}"
                              >  
                     <f:facet name="header">
                         <p:outputPanel>

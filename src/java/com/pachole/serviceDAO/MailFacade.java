@@ -7,6 +7,8 @@ package com.pachole.serviceDAO;
 
 import com.pachole.entities.Mail;
 import com.pachole.entities.User;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -30,7 +32,7 @@ public class MailFacade extends AbstractFacade<Mail> {
     public MailFacade() {
         super(Mail.class);
     }
-    
+
     @Override
     public void create(Mail mail) {
         try {
@@ -39,12 +41,45 @@ public class MailFacade extends AbstractFacade<Mail> {
             throw new Error(e);
         }
     }
+
+    public List<Mail> filterMails(String author, Date date, String topic, String receiver, User user) {
+        List<Mail> result;
+        
+        try {
+            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ((m.authorName = :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND (m.date = :date IS NULL OR m.date LIKE CONCAT('%', :date, '%')) AND (m.messageTopic = :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND (m.receiver = :receiver IS NULL OR m.receiver LIKE CONCAT('%', :receiver, '%')) AND (m.idUser = :idUser IS NULL OR m.idUser LIKE CONCAT('%', :idUser, '%')))", Mail.class)
+                    .setParameter("author", author)
+                    .setParameter("date", date)
+                    .setParameter("topic", topic)
+                    .setParameter("receiver", receiver)
+                    .setParameter("idUser", user)
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
     
-    public List<Mail> findByLoggedUser(User user){
-        List<Mail> result; 
-       try{
-            result = getEntityManager().createNativeQuery("SELECT * FROM Mail WHERE idUser = "+user.getIdUser()+" GROUP BY BINARY messageTopic", Mail.class).getResultList();
-        } catch(Exception e){
+    public List<Mail> filterMailsWithoutDate(String author, String topic, String receiver, User user) {
+        List<Mail> result;
+        
+        try {
+            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ( ( :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND ( :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND (:receiver IS NULL OR m.receiver LIKE CONCAT('%', :receiver, '%')) AND ( m.idUser =:idUser ) )", Mail.class)
+                    .setParameter("author", author)
+                    .setParameter("topic", topic)
+                    .setParameter("receiver", receiver)
+                    .setParameter("idUser", user)
+                    .getResultList();
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        return result;
+    }
+
+    public List<Mail> findByLoggedUser(User user) {
+        List<Mail> result;
+        try {
+            result = getEntityManager().createNativeQuery("SELECT * FROM Mail WHERE idUser = " + user.getIdUser() + " GROUP BY BINARY messageTopic", Mail.class).getResultList();
+        } catch (Exception e) {
             throw new Error(e);
         }
         return result;

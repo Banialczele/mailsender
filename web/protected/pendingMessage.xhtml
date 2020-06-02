@@ -39,24 +39,17 @@
             <p:panel header="Pomyślnie wysłane wiadomości" style="border: none; width: 100vw; padding:0;"> 
                 <h:outputText value="Brak wiadomości do wyświetlenia" rendered="#{empty messagePending.pendingList}"/>
 
-                <p:dataTable value="#{messagePending.pendingList}" var="s"
+                <p:dataTable value="#{messagePending.pendingList}" 
+                             var="s"
+                             lazy="true"
                              paginator="true" 
                              rows="5" 
                              rendered="#{not empty messagePending.pendingList}"
                              rowsPerPageTemplate="5,10,15,20,50"
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                              currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                             filteredValue="#{messagePending.controller.filteredList}"
-                             emptyMessage="No messages found with given criteria"
-                             globalFilterFunction="#{messagePending.controller.globalFilterFunction}"
                              widgetVar="pendingList"
-                             >    
-                    <f:facet name="header">
-                        <p:outputPanel>
-                            <h:outputText value="Filtruj wiadomości:" />
-                            <p:inputText id="globalFilter" onkeyup="PF('pendingList').filter()" style="width:150px" placeholder="Enter keyword"/>
-                        </p:outputPanel>
-                    </f:facet>
+                             >                        
                     <p:column headerText="Adres email">
                         #{s.idClient.email}
                     </p:column>
@@ -67,7 +60,9 @@
                         #{s.idMail.authorName}
                     </p:column>
                     <p:column headerText="Data wysłania">
-                        #{s.idMail.date}
+                        <h:outputText value="#{s.idMail.date}">
+                            <f:convertDateTime pattern="d/MM/yyyy HH:mm" />
+                        </h:outputText>
                     </p:column>
                 </p:dataTable>
             </p:panel>
