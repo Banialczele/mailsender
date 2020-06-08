@@ -12,3 +12,39 @@ body {
 .hover:hover {
     background: rgba(35,35,35, 0.2);
 }
+
+
+.ui-datatable .ui-datatable-header {
+    margin: 15px 0;
+}
+
+.ui-datatable .ui-paginator-top {
+    display: none;
+}
+
+.outputEtiquette {
+    background: rgb(0, 115, 255); 
+    color:white; 
+    padding: 3px 15px; 
+    border-radius: 5px; 
+    margin: 0 5px;
+}
+
+.clientDetailLayout {
+    border-style: none;
+}
+
+.ui-panelgrid-content {
+    border-style: none; 
+    background: inherit;
+}
+
+.clientDetailLayout .ui-panelgrid-content {
+    width: 100%;
+    height: 100%;
+    border-style: none; 
+    background: rgb(51, 51, 53);
+    border-radius: 15px;
+    color: white;
+    padding: 20px 5px;
+}

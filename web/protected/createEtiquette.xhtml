@@ -20,12 +20,9 @@
                     <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -37,11 +34,11 @@
         </h:form>
 
         <h:form id="etiquetteForm" class="etiquettteForm">
-            <p:panelGrid columns="1" layout="grid" style="margin: 10px auto; width: 100vw;">
+            <p:panelGrid id="addingLabelForm" columns="1" layout="grid" style="margin: 10px auto; width: 100vw;">
                 <p:outputLabel value="Dodaj nową etykiete"/>
                 <p:inputText id="etiquetteName" value="#{etiquetteManagement.etiquetteName}"></p:inputText>
-                <p:commandButton value="Zapisz etykiete" action="#{etiquetteManagement.saveEtiquette}" update="etiquetteForm" form="etiquetteForm" id="saveEtiquette"/>
-
+                <p:commandButton resetValues="true" value="Zapisz etykiete" action="#{etiquetteManagement.saveEtiquette}" update="@form" />
+                <p:messages id="addingLabelMessage" />
             </p:panelGrid>
             <p:messages globalOnly="true" for="saveEtiquette"/>
         </h:form>

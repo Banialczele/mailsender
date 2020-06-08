@@ -8,7 +8,7 @@
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
-        <h:outputStylesheet name="css/recipients.css"/>
+        <h:outputStylesheet name="css/messagesStyles.css" />
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
     <h:body>
@@ -19,12 +19,9 @@
                     <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -35,18 +32,50 @@
             </p:menubar>
         </h:form>
 
+        <p:fieldset legend="Wyszukaj" toggleable="true" toggleSpeed="500" collapsed="true" style="margin: 25px 0;">            
+            <h:form id="messagesForm">
+                <p:panelGrid columns="2" styleClass="ui-noborder searchMail">
+                    <p:outputLabel value="Wpisz temat"/>
+                    <p:inputText value="#{messageStatus.topic}" placeholder="Wprowadź temat"/>
+
+                    <p:outputLabel value="Wprowadź status" />
+                    <p:selectOneMenu id="selectStatus" value="#{messageStatus.status}">
+                        <f:selectItem itemLabel="Wybierz status" itemValue="" />
+                        <f:selectItem itemLabel="Oczekuje na wysłanie" itemValue="0" />
+                        <f:selectItem itemLabel="Wysłano" itemValue="1" />
+                        <f:selectItem itemLabel="Nie wysłano wiadomości" itemValue="2" />
+                        <f:selectItem itemLabel="Oczekuje w kolejce" itemValue="3" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Wprowadź datę"/>
+                    <p:datePicker value="#{messageStatus.date}" id="timeDe" showIcon="true" showTime="true" locale="pl" pattern="d/MM/yyyy HH:mm"/>
+
+                    <p:outputLabel value="Wprowadź nazwę autora"/>
+                    <p:inputText value="#{messageStatus.author}" placeholder="Autor"/>
+
+                    <p:outputLabel value="Wprowadź adres odbiorcy"/>
+                    <p:inputText value="#{messageStatus.receiver}" placeholder="adres odbiorcy"/>
+
+                    <p:commandButton value="Wyszukaj" action="#{messageStatus.filterMails()}" update=":addressedMessageForm" />
+                    <p:commandButton value="Resetuj filtry" action="#{messageStatus.resetFilter()}" update="messagesForm, :addressedMessageForm" />
+                </p:panelGrid>
+
+            </h:form>
+        </p:fieldset>
+
         <h:form id="addressedMessageForm" >
-            <p:panel header="Pomyślnie wysłane wiadomości" style="border: none; width: 100vw; padding:0;"> 
-                <h:outputText value="Brak wiadomości do wyświetlenia" rendered="#{empty messageSuccess.successfulList}"/>
-                <p:dataTable value="#{messageSuccess.successfulList}" var="s"
+            <p:panel header="#{ messageStatus.status == 0 ? 'Wiadomości oczekujące na wysłanie' : messageStatus.status == 1 || messageStatus.status == null ? 'Wysłane wiadomości' : messageStatus.status == 2 ? 'Wiadomości, które nie zostały wysłane' : 'Wiadomości oczekujące w kolejce' }"  style="border: none; width: 100vw; padding:0;"> 
+                <h:outputText value="Brak wiadomości do wyświetlenia" rendered="#{empty messageStatus.successfulList}"/>
+                <p:dataTable value="#{messageStatus.successfulList}" var="s"
                              paginator="true" 
-                             rows="5" 
+                             rows="20"
+                             rowsPerPageTemplate="20,30,40,50"
                              lazy="true"
-                             rendered="#{not empty messageSuccess.successfulList}"
-                             rowsPerPageTemplate="5,10,15,20,50"
+                             rendered="#{not empty messageStatus.successfulList}"
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             currentPageReportTemplate= "Liczba rekordów: {totalRecords}"
                              widgetVar="successMessages"
+                             id="messages"
                              >    
                     <p:column headerText="Adres email">
                         #{s.idClient.email}

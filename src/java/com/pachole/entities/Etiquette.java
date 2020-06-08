@@ -55,7 +55,7 @@ public class Etiquette implements Serializable {
     private String name;
     @Basic(optional = false)
     @Column(name = "archive")
-    private String archive;
+    private Integer archive;
     @JoinTable(name = "mail_has_etiquette", joinColumns = {
         @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")}, inverseJoinColumns = {
         @JoinColumn(name = "idMail", referencedColumnName = "idMail")})
@@ -74,7 +74,7 @@ public class Etiquette implements Serializable {
         this.idGroup = idGroup;
     }
 
-    public Etiquette(Integer idGroup, String name, String archive) {
+    public Etiquette(Integer idGroup, String name, Integer archive) {
         this.idGroup = idGroup;
         this.name = name;
         this.archive = archive;
@@ -96,11 +96,11 @@ public class Etiquette implements Serializable {
         this.name = name;
     }
 
-    public String getArchive() {
+    public Integer getArchive() {
         return archive;
     }
 
-    public void setArchive(String archive) {
+    public void setArchive(Integer archive) {
         this.archive = archive;
     }
 

@@ -53,10 +53,6 @@ public class Mail implements Serializable {
     private Integer idMail;
     @Basic(optional = false)
     @Lob
-    @Column(name = "receiver")
-    private String receiver;
-    @Basic(optional = false)
-    @Lob
     @Column(name = "messageContent")
     private String messageContent;
     @Basic(optional = false)
@@ -83,9 +79,8 @@ public class Mail implements Serializable {
         this.idMail = idMail;
     }
 
-    public Mail(Integer idMail, String receiver, String messageContent, String messageTopic, Date date, String authorName) {
+    public Mail(Integer idMail, String messageContent, String messageTopic, Date date, String authorName) {
         this.idMail = idMail;
-        this.receiver = receiver;
         this.messageContent = messageContent;
         this.messageTopic = messageTopic;
         this.date = date;
@@ -98,14 +93,6 @@ public class Mail implements Serializable {
 
     public void setIdMail(Integer idMail) {
         this.idMail = idMail;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
     }
 
     public String getMessageContent() {

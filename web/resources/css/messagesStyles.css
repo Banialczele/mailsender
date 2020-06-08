@@ -1,0 +1,8 @@
+
+.ui-datatable .ui-datatable-header {
+    margin: 15px 0;
+}
+
+.ui-datatable .ui-paginator-top {
+    display: none;
+}

@@ -1,0 +1,23 @@
+body {    
+    height: 100%;
+    width: 100%;
+    background: rgb(35,35,35);
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    flex-direction: column;
+}
+
+.ui-datatable .ui-datatable-header {
+    margin: 15px 0;
+}
+
+.ui-datatable .ui-paginator-top {
+    display: none;
+}
+
+.ui-panelgrid-content {
+    background: inherit;
+    border-style: none;
+}

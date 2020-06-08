@@ -27,6 +27,7 @@ public class EtiquetteManagement implements Serializable {
     private Etiquette chosenEtiquette;
     private static Client selectedClient;
     private String etiquetteName;
+    private String searchString;
 
     @Inject
     private ClientFacade clientDAO;
@@ -39,6 +40,11 @@ public class EtiquetteManagement implements Serializable {
         HttpSession session = SessionUtil.getSession();
         loggedUser = (User) session.getAttribute("user");
         clientsWithoutLabel = clientDAO.findClientsWithoutLabel(loggedUser);
+        etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
+    }
+
+    public List<Etiquette> findAllEtiquettes() {
+        return etiquetteList;
     }
 
     public List<Client> showClients() {
@@ -50,13 +56,18 @@ public class EtiquetteManagement implements Serializable {
         chosenEtiquette = etiquetteDAO.findByName(etiquetteName);
         List<Etiquette> updateLabelList;
         updateLabelList = (List<Etiquette>) selectedClient.getEtiquetteCollection();
-        updateLabelList.add(chosenEtiquette);        
-        clientDAO.edit(selectedClient);
-    }
-
-    public List<Etiquette> findAllEtiquettes() {
-        etiquetteList = etiquetteDAO.getAllEtiquettes(loggedUser);
-        return etiquetteList;
+        try {
+            updateLabelList.add(chosenEtiquette);
+            clientDAO.edit(selectedClient);
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            ctx.addMessage("assignLabelMessage", new FacesMessage(FacesMessage.SEVERITY_INFO, "Pomyślnie dodano etykiete do klienta!",
+                    null));
+        } catch (Exception e) {
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            ctx.addMessage("assignLabelMessage", new FacesMessage(FacesMessage.SEVERITY_INFO, "Nie udało się dodać etykiety",
+                    null));
+            throw new Error(e);
+        }
     }
 
     public void saveEtiquette() {
@@ -69,22 +80,27 @@ public class EtiquetteManagement implements Serializable {
         if (etiqutte == null) {
             Etiquette newEtiquette = new Etiquette();
             newEtiquette.setName(etiquetteName);
-            newEtiquette.setArchive("Test");
+            newEtiquette.setArchive(1);
             newEtiquette.setIdUser(loggedUser);
             try {
                 etiquetteDAO.create(newEtiquette);
                 FacesContext ctx = FacesContext.getCurrentInstance();
-                ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null,
-                        "Pomyślnie dodano etykiete!"));
+                ctx.addMessage("addingLabelMessage", new FacesMessage(FacesMessage.SEVERITY_INFO, "Pomyślnie dodano etykiete!",
+                        null));
             } catch (Exception e) {
                 FacesContext ctx = FacesContext.getCurrentInstance();
-                ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Coś poszło nie tak!"));
+                ctx.addMessage("addingLabelMessage", new FacesMessage(FacesMessage.SEVERITY_INFO, "Coś poszło nie tak!", null));
                 throw new Error(e);
             }
         } else {
             FacesContext ctx = FacesContext.getCurrentInstance();
-            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Etykieta o podanej nazwie już istnieje"));
+            ctx.addMessage("addingLabelMessage", new FacesMessage(FacesMessage.SEVERITY_INFO, "Etykieta o podanej nazwie już istnieje", null));
         }
+    }
+
+    public List<Etiquette> filterEtiquettes() {
+        etiquetteList = etiquetteDAO.findListBySubstring(searchString);
+        return etiquetteList;
     }
 
     public List<Client> getClientsWithoutLabel() {
@@ -125,6 +141,22 @@ public class EtiquetteManagement implements Serializable {
 
     public void setChosenEtiquette(Etiquette chosenEtiquette) {
         this.chosenEtiquette = chosenEtiquette;
+    }
+
+    public List<Etiquette> getEtiquetteList() {
+        return etiquetteList;
+    }
+
+    public void setEtiquetteList(List<Etiquette> etiquetteList) {
+        this.etiquetteList = etiquetteList;
+    }
+
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
     }
 
 }

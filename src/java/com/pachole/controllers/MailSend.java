@@ -80,11 +80,15 @@ public class MailSend implements Serializable {
     }
 
     public List<Client> messageClients(List<String> etiquetteName) {
+
         List<Client> clients = clientDAO.findClientEmailByEtiquetteName(etiquetteName);
+
         List<Client> clientsWithoutDuplicates = new ArrayList<>();
+
         clients.stream().filter((c) -> (!clientsWithoutDuplicates.contains(c))).forEachOrdered((c) -> {
             clientsWithoutDuplicates.add(c);
         });
+
         return clientsWithoutDuplicates;
     }
 
@@ -97,19 +101,18 @@ public class MailSend implements Serializable {
         String author = loggedUser.getFirstName() + " " + loggedUser.getUserMail();
         DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm");
         Date dateobj = new Date();
-        System.out.println();
-        
+
         if (selectedMessage == null) {
-            clientData = messageClients(etiquetteName);
             etiquetteCollection = messageEtiquettes(etiquetteName);
+            clientData = messageClients(etiquetteName);
         } else if (selectedMessage != null) {
             topic = selectedMessage.getMessageTopic();
             content = selectedMessage.getMessageContent();
             for (Etiquette e : selectedMessage.getEtiquetteCollection()) {
                 etiquetteName.add(e.getName());
             }
-            clientData = messageClients(etiquetteName);
             etiquetteCollection = messageEtiquettes(etiquetteName);
+            clientData = messageClients(etiquetteName);
         }
 
         Properties prop = new Properties();
@@ -127,49 +130,66 @@ public class MailSend implements Serializable {
                 return new PasswordAuthentication(mailAccount.getMailAddress(), mailAccount.getPassword());
             }
         });
+
         System.out.println("Trying to send an email");
 
-        Mail emailMessage;
-        Mailstatus emailStatus;
+        //Creating message and saving it in DB.
+        Mail emailMessage = new Mail();
+        emailMessage.setMessageContent(content.trim());
+        emailMessage.setMessageTopic(topic.trim());
+        emailMessage.setDate(df.parse(df.format(dateobj)));
+        emailMessage.setAuthorName(author);
+        emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
+        emailMessage.setIdUser(loggedUser);
+        emailMessage.getEtiquetteCollection().addAll(etiquetteCollection);
+        try {
+            mailDAO.create(emailMessage);
+            //Setting collection of labels assigned to message
+            for (Etiquette e : etiquetteCollection) {
+                try {
+                    e.getMailCollection().add(emailMessage);
+                    etiquetteDAO.updateEtiquetteMailCollection(e);
+                } catch (Exception ex) {
+                    throw new Error(ex);
+                }
+            }
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+
         for (Client client : clientData) {
             if (client.getStatus() == 1) {
                 try {
                     receiver = client.getEmail();
-                    emailMessage = new Mail();
-                    emailStatus = new Mailstatus();
+                    Mailstatus emailStatus = new Mailstatus();
 
-                    emailMessage.setReceiver(receiver.trim());
-                    emailMessage.setMessageContent(content.trim());
-                    emailMessage.setMessageTopic(topic.trim());
-                    emailMessage.setDate(df.parse(df.format(dateobj)));
-                    emailMessage.setAuthorName(author);
-                    emailMessage.setEtiquetteCollection(new ArrayList<Etiquette>());
-                    emailMessage.setIdUser(loggedUser);
-                    emailMessage.getEtiquetteCollection().addAll(etiquetteCollection);
-
-                    try {
-                        for (Etiquette e : etiquetteCollection) {
-                            mailDAO.create(emailMessage);
-                            e.getMailCollection().add(emailMessage);
-                            etiquetteDAO.updateEtiquetteMailCollection(e);
-
-                            emailStatus.setDate(df.parse(df.format(dateobj)));
-                            emailStatus.setMailStatus("0");
-                            emailStatus.setStatus("0");
-                            emailStatus.setIdClient(client);
-                            emailStatus.setIdMail(emailMessage);
-                            emailStatus.setIdMailAccounts(mailAccount);
-                            statusDAO.create(emailStatus);
-                        }
-                    } catch (Exception e) {
+                    try {                  
+//                        Setting status of a message.
+                        emailStatus.setDate(df.parse(df.format(dateobj)));
+                        emailStatus.setMailStatus("0");
+                        emailStatus.setStatus("0");
+                        emailStatus.setIdClient(client);
+                        emailStatus.setIdMail(emailMessage);
+                        emailStatus.setIdMailAccounts(mailAccount);
+                        statusDAO.create(emailStatus);
+                    } catch (ParseException e) {
+                        emailStatus.setDate(df.parse(df.format(dateobj)));
+                        emailStatus.setMailStatus("2");
+                        emailStatus.setStatus("2");
+                        emailStatus.setIdClient(client);
+                        emailStatus.setIdMail(emailMessage);
+                        emailStatus.setIdMailAccounts(mailAccount);
+                        statusDAO.update(emailStatus);
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udało się wysłać wiadomości", ""));
+                        Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, e);
                         throw new Error(e);
                     }
-
                     Message message = new MimeMessage(session);
                     message.setFrom(new InternetAddress(mailAccount.getMailAddress()));
                     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
-                    message.setSubject(topic);
-                    message.setText(content);
+                    message.setSubject(emailMessage.getMessageTopic());
+                    message.setText(emailMessage.getMessageContent());
+
                     Transport.send(message);
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Pomyślnie wysłano wiadomość ", " " + message));
 
@@ -180,7 +200,7 @@ public class MailSend implements Serializable {
                     emailStatus.setIdMail(emailMessage);
                     emailStatus.setIdMailAccounts(mailAccount);
                     statusDAO.update(emailStatus);
-                } catch (AddressException ex) {
+                } catch (ParseException ex) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udało się wysłać wiadomości", ""));
                     Logger.getLogger(MailSend.class.getName()).log(Level.SEVERE, null, ex);
                 }

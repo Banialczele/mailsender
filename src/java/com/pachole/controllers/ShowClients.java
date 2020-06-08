@@ -9,13 +9,13 @@ import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
 @Named
-@RequestScoped
+@ViewScoped
 public class ShowClients implements Serializable {
 
     @Inject
@@ -31,6 +31,8 @@ public class ShowClients implements Serializable {
 
     private User loggedUser;
 
+    private String newEtiquetteName;
+    private boolean archiveValue;
     private String searchString;
     private String name;
     private String status;
@@ -60,6 +62,21 @@ public class ShowClients implements Serializable {
         showTable = true;
         clientList = clientDAO.findClientsByEtiquette(selectedEtiquette.getName());
         return clientList;
+    }
+
+    public void updateMessage() {
+        System.out.println("xD");
+    }
+
+    public void deleteEtiquette() {
+        etiquetteList.remove(selectedEtiquette);
+        etiquetteDAO.remove(selectedEtiquette);
+    }
+
+    public void updateEtiquette() {
+        etiquetteDAO.updateEtiquette(selectedEtiquette, newEtiquetteName, archiveValue);
+        newEtiquetteName = null;
+        archiveValue = false;
     }
 
     public List<Client> filterClients() {
@@ -106,7 +123,7 @@ public class ShowClients implements Serializable {
     public void setSearchString(String searchString) {
         this.searchString = searchString;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -129,6 +146,22 @@ public class ShowClients implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getNewEtiquetteName() {
+        return newEtiquetteName;
+    }
+
+    public void setNewEtiquetteName(String newEtiquetteName) {
+        this.newEtiquetteName = newEtiquetteName;
+    }
+
+    public boolean isArchiveValue() {
+        return archiveValue;
+    }
+
+    public void setArchiveValue(boolean archiveValue) {
+        this.archiveValue = archiveValue;
     }
 
 }

@@ -7,11 +7,9 @@ import com.pachole.utils.SessionUtil;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +28,7 @@ public class MailMessages implements Serializable {
     private Date date;
     private String topic;
     private String receiver;
+    private Mail selectedMessage;
 
     @PostConstruct
     public void init() {
@@ -37,9 +36,13 @@ public class MailMessages implements Serializable {
         loggedUser = (User) session.getAttribute("user");
         messageList = mailDAO.findByLoggedUser(loggedUser);
     }
-    
-    public List<Mail> resetFilter(){
+
+    public List<Mail> resetFilter() {
         messageList = mailDAO.findByLoggedUser(loggedUser);
+        author = null;
+        date = null;
+        topic = null;
+        receiver = null;
         return messageList;
     }
 
@@ -47,9 +50,9 @@ public class MailMessages implements Serializable {
         if (date != null) {
             SimpleDateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm");
             Date dataObj = df.parse(df.format(date));
-            messageList = mailDAO.filterMails(author, dataObj, topic, receiver, loggedUser);
+            messageList = mailDAO.filterMails(author, dataObj, topic, loggedUser);
         } else {
-            messageList = mailDAO.filterMailsWithoutDate(author, topic, receiver, loggedUser);
+            messageList = mailDAO.filterMailsWithoutDate(author, topic, loggedUser);
         }
         return messageList;
     }
@@ -100,6 +103,14 @@ public class MailMessages implements Serializable {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
+    }
+
+    public Mail getSelectedMessage() {
+        return selectedMessage;
+    }
+
+    public void setSelectedMessage(Mail selectedMessage) {
+        this.selectedMessage = selectedMessage;
     }
 
 }

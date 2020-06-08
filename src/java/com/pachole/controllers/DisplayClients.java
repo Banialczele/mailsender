@@ -24,6 +24,7 @@ public class DisplayClients implements Serializable {
     private ClientFacade clientDAO;
 
     private List<Client> clientList;
+    private Client selectedClient;
     private User loggedUser;
 
     @PostConstruct
@@ -60,6 +61,14 @@ public class DisplayClients implements Serializable {
 
     public void setClientList(List<Client> clientList) {
         this.clientList = clientList;
+    }
+
+    public Client getSelectedClient() {
+        return selectedClient;
+    }
+
+    public void setSelectedClient(Client selectedClient) {
+        this.selectedClient = selectedClient;
     }
 
 }

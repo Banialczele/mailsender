@@ -24,12 +24,9 @@
                     <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -53,6 +50,7 @@
                                      rows="10" 
                                      rowsPerPageTemplate="5,10,15,20,50"    
                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate= "Liczba rekordów: {totalRecords}"
                                      >
                             <p:column headerText="Nazwa klienta">
                                 <h:outputText value="#{client.name}"/>
@@ -81,13 +79,18 @@
                     </p:dialog>
                 </h:form>
             </p:tab>
-            <p:tab title="Klienci posiadający etykiete">
-                <h:form id="clientsWithEtiquette">
+            <p:tab title="Przypisz etykiete do klienta">
+                <h:form id="assignEtiquetteToClient">
+                    <p:messages id="assignLabelMessage"/>
+
                     <p:dataTable value="#{etiquetteManagement.showClients()}" 
                                  var="client"
                                  lazy="true"
-                                 paginator="true"
-                                 rows="10"
+                                 paginator="true" 
+                                 rows="10" 
+                                 rowsPerPageTemplate="5,10,15,20,50"    
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate= "Liczba rekordów: {totalRecords}"
                                  >
                         <p:column headerText="Nazwa klienta">
                             <h:outputText value="#{client.name}" />
@@ -101,11 +104,46 @@
                                 <p:selectOneMenu value="#{etiquetteManagement.etiquetteName}" dynamic="true">
                                     <f:selectItem itemLabel="Wybierz etykiete " itemValue="#{null}"/>
                                     <f:selectItems value="#{etiquetteManagement.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
-                                </p:selectOneMenu>
-                                <p:commandButton value="Zapisz" action="#{etiquetteManagement.updateClient()}" process="@parent" update="@parent">
+                                </p:selectOneMenu> 
+                                <p:commandButton value="Zapisz" action="#{etiquetteManagement.updateClient()}" update="@form">
                                     <f:setPropertyActionListener target="#{etiquetteManagement.selectedClient}" value="#{client}"/>
                                 </p:commandButton>
-                            </p:overlayPanel>
+                            </p:overlayPanel>                            
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>            
+
+            <p:tab title="Przypisz etykiete do wielu klientów">
+                <h:form id="assignEtiquetteToClients">
+                    <p:messages id="assignLabelMessage"/>
+
+                    <p:dataTable value="#{etiquetteManagement.showClients()}" 
+                                 var="client"
+                                 lazy="true"
+                                 paginator="true" 
+                                 rows="10" 
+                                 rowsPerPageTemplate="5,10,15,20,50"    
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate= "Liczba rekordów: {totalRecords}"
+                                 >
+                        <p:column headerText="Nazwa klienta">
+                            <h:outputText value="#{client.name}" />
+                        </p:column>
+                        <p:column headerText="Email">
+                            <h:outputText value="#{client.email}" />
+                        </p:column>
+                        <p:column headerText="Dodaj etykiete">
+                            <p:commandButton value="Dodaj" id="addEtiquette"/>
+                            <p:overlayPanel for="addEtiquette" dynamic="true">
+                                <p:selectOneMenu value="#{etiquetteManagement.etiquetteName}" dynamic="true">
+                                    <f:selectItem itemLabel="Wybierz etykiete " itemValue="#{null}"/>
+                                    <f:selectItems value="#{etiquetteManagement.findAllEtiquettes()}" var="etiquette" itemLabel="#{etiquette.name}" itemValue="#{etiquette.name}"/>
+                                </p:selectOneMenu> 
+                                <p:commandButton value="Zapisz" action="#{etiquetteManagement.updateClient()}" update="@form">
+                                    <f:setPropertyActionListener target="#{etiquetteManagement.selectedClient}" value="#{client}"/>
+                                </p:commandButton>
+                            </p:overlayPanel>                            
                         </p:column>
                     </p:dataTable>
                 </h:form>

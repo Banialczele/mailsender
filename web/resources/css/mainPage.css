@@ -13,7 +13,24 @@ body {
     border-style: none !important;
 }
 
-.searchMail .ui-widget-content td {
-    padding: 10px 0;
-    border: 1px solid red;
+
+.ui-datatable .ui-datatable-header {
+    margin: 15px 0;
+}
+
+.ui-datatable .ui-paginator-top {
+    display: none;
+}
+
+.ui-panelgrid .ui-panelgrid-content{
+    border-style: none;
+    background: inherit;
+}
+
+.outputEtiquette {
+    background: rgb(0, 115, 255); 
+    color:white; 
+    padding: 3px 15px; 
+    border-radius: 5px; 
+    margin: 0 5px;
 }

@@ -19,12 +19,9 @@
                     <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -36,7 +33,7 @@
         </h:form>
 
         <h:form id="sendMessageForm" class="mailSenderForm" style="background: rgb(245,245,245); border-radius: 15px; width: 100vw;">
-            <div class="ui-fluid" >
+            <div class="ui-fluid" style="margin: 20px auto; width: 60vw; padding: 10px;">
                 <h:panelGrid styleClass="senderGrid ui-fluid" style="margin: 20px auto;">
                     <p:outputLabel value="Tytuł"/>
                     <p:inputText value="#{mailSend.topic}" placeholder="#{mailSend.topic}" required="true"></p:inputText>
@@ -45,7 +42,7 @@
                     <p:autoComplete id="etiquetteList" maxResults="7" value="#{mailSend.etiquetteName}" completeMethod="#{mailSend.showNamesList}" multiple="true" required="true" />           
                     <p:outputLabel value="Wiadomość" />
                     <p:inputTextarea value="#{mailSend.content}" required="true"/>
-                    <p:commandButton value="Wyślij" action="#{mailSend.sendMessage(null)}"/>
+                    <p:commandButton value="Wyślij" actionListener="#{mailSend.sendMessage(null)}"/>
                 </h:panelGrid>
             </div>           
         </h:form>

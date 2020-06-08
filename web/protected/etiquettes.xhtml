@@ -8,7 +8,7 @@
     <h:head>
         <title>Mail Sender App</title>
         <h:outputStylesheet name="css/navStyle.css" />
-        <h:outputStylesheet name="css/recipients.css"/>
+        <h:outputStylesheet name="css/etiquettes.css"/>
         <h:outputStylesheet name="css/floatTabs.css"/>
         <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
     </h:head>
@@ -17,15 +17,12 @@
             <p:menubar style="margin: 20px auto; width: 98vw;">
                 <p:submenu label="Etykiety" icon="pi pi-tag">
                     <p:menuitem value="Moje etykiety" outcome="etiquettes.xhtml"/>
-                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
+                    <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>                    
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -36,7 +33,7 @@
             </p:menubar>
         </h:form>
 
-        <p:panel style="background: inherit; border: none; width: 100vw;">
+        <p:panel id="mainPanel" style="background: inherit; border: none; width: 100vw;">
             <p:fieldset legend="Przeszukaj etykiety" toggleable="true" collapsed="true" toggleSpeed="500" style="margin: 25px 0;">
                 <h:form style="float:left; padding: 15px 30px;">                
                     <h:outputText value="Wpisz nazwę"/>
@@ -55,29 +52,41 @@
                                  rendered="#{not empty showClients.etiquetteList}"
                                  styleClass="borderless"
                                  paginator="true" 
-                                 rows="5" 
-                                 rowsPerPageTemplate="5,10,15,20,50" 
+                                 rows="20" 
+                                 rowsPerPageTemplate="20,30,40,50" 
                                  lazy="true"
                                  selectionMode="single"
                                  selection="#{showClients.selectedEtiquette}"
                                  rowKey="#{e.idGroup}"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records">
-                        <p:column headerText="Etykieta">                 
+                                 currentPageReportTemplate = "Liczba rekordów: {totalRecords}">
+                        <f:facet name="header">
+                            <h:outputText value="Lista etykiet" />
+                        </f:facet>
+                        <p:column headerText="Etykieta" style="width: 35vw;">                 
                             <h:outputText value="#{e.name}"/>
                         </p:column>
-                        <p:column>
-                            <p:commandButton process="@form" update=":clientListPanel" actionListener="#{showClients.clientsForChosenLabel()}" value="Lista klientów"/>
+                        <p:column headerText="Status" style="width: 5vw;">                 
+                            <h:outputText value="#{e.archive}"/>
+                        </p:column>
+                        <p:column headerText="Opcje">
+                            <p:panelGrid layout="grid" columns="3">
+                                <p:commandButton value="Pokaż klientów" action="#{showClients.clientsForChosenLabel()}" update=":clientListDialog" oncomplete="PF('clientsDialog').show();"/>
+                                <p:commandButton value="Szczegóły" update=":updateEtiquette" oncomplete="PF('etiquetteDialog').show();"/>                                
+                                <p:commandButton value="Usuń" actionListener="#{showClients.deleteEtiquette()}" update="@form"/>
+                            </p:panelGrid>
                         </p:column>
                     </p:dataTable>
                 </p:panel>
             </h:form>
         </p:panel>
 
-        <p:panel id="clientListPanel" visible="#{showClients.showTable}" style="background: inherit; border: none; width: 100vw;">
-            <p:fieldset legend="Znajdź klienta" toggleable="true" toggleSpeed="500" style="margin: 25px 0;" collapsed="true">
+        <p:dialog id="clientListDialog" widgetVar="clientsDialog" dynamic="true" closeOnEscape="true" style="background: rgb(51, 51, 53); border-style:none;" resizable="false"> 
+            <h:outputText rendered="#{empty showClients.clientList}" value="Brak klientów" style=" color: white;"/>
+
+            <p:fieldset legend="Znajdź klienta" toggleable="true" toggleSpeed="500" style="margin: 25px 0;" collapsed="true" rendered="#{not empty showClients.clientList}">
                 <h:form style="float:left; padding: 15px 30px;"> 
-                    <p:panelGrid columns="3">
+                    <p:panelGrid layout="grid" columns="3">
                         <p:outputLabel value="Wyszukaj po nazwie klienta"/>
                         <p:inputText value="#{showClients.name}" placeholder="Klient"/>
                         <p:outputLabel value="Wyszukaj po email"/>
@@ -88,51 +97,54 @@
                     <p:commandButton value="Znajdź" actionListener="#{showClients.filterClients}" update=":clientListForm:clientListTable"/>
                 </h:form>
             </p:fieldset>
+            <h:form id="clientListForm" 
+                    style="margin: 25px auto;">
+                <p:dataTable  id="clientListTable" 
+                              value="#{showClients.clientList}"
+                              rendered="#{not empty showClients.clientList}"
+                              var="client"
+                              multiViewState="true"
+                              paginator="true"
+                              rows="20"
+                              rowsPerPageTemplate="20,30,40,50"
+                              pageLinks="5"
+                              lazy="true"
+                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                              currentPageReportTemplate= "Liczba rekordów: {totalRecords}"
+                              widgetVar="cellClient"
+                              editable ="true"
+                              editMode="cell"
+                              style="width: 80vw;"
+                              >                       
+                    <f:facet name="header">
+                        <h:outputText value="Lista klientów dla etykiety #{showClients.selectedEtiquette.name}" />
+                    </f:facet>
+                    <p:column headerText="Nazwa klienta">
+                        <h:outputText value="#{client.name} " />
+                    </p:column>
+                    <p:column headerText="Adres email">
+                        <h:outputText value="#{client.email}"/>
+                    </p:column>
+                    <p:column headerText="Status">
+                        <h:outputText value="#{client.status}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form> 
+        </p:dialog>
 
-            <p:panel>
-                <h:form id="clientListForm" 
-                        style="margin: 25px auto;">
-                    <p:dataTable  id="clientListTable" 
-                                  value="#{showClients.clientList}" 
-                                  var="client"
-                                  multiViewState="true"
-                                  paginator="true"
-                                  rows="10"
-                                  pageLinks="5"
-                                  lazy="true"
-                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                  widgetVar="cellClient"
-                                  editable ="true"
-                                  editMode="cell"
-                                  >
-                        <p:ajax event="cellEdit" listener="#{showClients.onCellEdit}" update="clientListTable"/>
-                        <f:facet name="header">
-                            <h:outputText value="Lista klientów dla etykiety #{showClients.selectedEtiquette.name}" />
-                        </f:facet>
-                        <p:column headerText="Nazwa klienta">
-                            <h:outputText value="#{client.name} " />
-                        </p:column>
-                        <p:column headerText="Adres email">
-                            <h:outputText value="#{client.email}"/>
-                        </p:column>
-                        <p:column headerText="Status">
-                            <h:outputText value="#{client.status}"/>
-                        </p:column>
-                    </p:dataTable>
-                </h:form> 
-            </p:panel>
+        <p:dialog widgetVar="etiquetteDialog" dynamic="true" closeOnEscape="true" id="updateEtiquette" header="Aktualizacja etykiety" resizable="false">
+            <h:form>
+                <p:panelGrid layout="grid" columns="5">
+                    <p:outputLabel value="Wprowadź nową nazwę" />
+                    <p:inputText placeholder="Nazwa" value="#{showClients.newEtiquetteName}"/>
 
+                    <p:outputLabel value="Aktualizuj status" />
+                    <p:selectBooleanCheckbox value="#{showClients.archiveValue}"/>
 
-        </p:panel>
-
-
-
-
-
-
-
-
-
+                    <p:commandButton value="Aktualizuj" update=":etiquetteListForm:groupTable" action="#{showClients.updateEtiquette()}" oncomplete="PF('etiquetteDialog').hide();"/>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
     </h:body>
 </html>
 

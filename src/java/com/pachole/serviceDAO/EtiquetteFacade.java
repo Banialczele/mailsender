@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.pachole.serviceDAO;
 
 import com.pachole.entities.Client;
@@ -15,10 +10,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-/**
- *
- * @author marci
- */
 @Stateless
 public class EtiquetteFacade extends AbstractFacade<Etiquette> {
 
@@ -42,6 +33,19 @@ public class EtiquetteFacade extends AbstractFacade<Etiquette> {
     @Override
     public void remove(Etiquette etiquette) {
         getEntityManager().remove(getEntityManager().merge(etiquette));
+    }
+
+    public void updateEtiquette(Etiquette etiquette, String name, boolean status) {
+        int value = status ? 1 : 0;
+        if (etiquette.getArchive() == value && !name.isEmpty()) {
+            etiquette.setName(name);
+        } else if (etiquette.getArchive() != value && !name.isEmpty()) {
+            etiquette.setArchive(value);
+            etiquette.setName(name);
+        } else if (etiquette.getArchive() != value && name.isEmpty()) {
+            etiquette.setArchive(value);
+        }
+        getEntityManager().merge(etiquette);
     }
 
     public List<Etiquette> findListBySubstring(String name) {

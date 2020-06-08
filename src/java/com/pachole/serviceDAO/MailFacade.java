@@ -42,15 +42,13 @@ public class MailFacade extends AbstractFacade<Mail> {
         }
     }
 
-    public List<Mail> filterMails(String author, Date date, String topic, String receiver, User user) {
-        List<Mail> result;
-        
+    public List<Mail> filterMails(String author, Date date, String topic, User user) {
+        List<Mail> result;        
         try {
-            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ((m.authorName = :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND (m.date = :date IS NULL OR m.date LIKE CONCAT('%', :date, '%')) AND (m.messageTopic = :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND (m.receiver = :receiver IS NULL OR m.receiver LIKE CONCAT('%', :receiver, '%')) AND (m.idUser = :idUser IS NULL OR m.idUser LIKE CONCAT('%', :idUser, '%')))", Mail.class)
+            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ((m.authorName = :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND (m.date = :date IS NULL OR m.date LIKE CONCAT('%', :date, '%')) AND (m.messageTopic = :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND (m.idUser = :idUser IS NULL OR m.idUser LIKE CONCAT('%', :idUser, '%')))", Mail.class)
                     .setParameter("author", author)
                     .setParameter("date", date)
                     .setParameter("topic", topic)
-                    .setParameter("receiver", receiver)
                     .setParameter("idUser", user)
                     .getResultList();
         } catch (Exception e) {
@@ -59,14 +57,13 @@ public class MailFacade extends AbstractFacade<Mail> {
         return result;
     }
     
-    public List<Mail> filterMailsWithoutDate(String author, String topic, String receiver, User user) {
+    public List<Mail> filterMailsWithoutDate(String author, String topic, User user) {
         List<Mail> result;
         
         try {
-            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ( ( :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND ( :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND (:receiver IS NULL OR m.receiver LIKE CONCAT('%', :receiver, '%')) AND ( m.idUser =:idUser ) )", Mail.class)
+            result = getEntityManager().createQuery("SELECT m FROM Mail m WHERE ( ( :author IS NULL OR m.authorName LIKE CONCAT('%', :author, '%')) AND ( :topic IS NULL OR m.messageTopic LIKE CONCAT('%', :topic, '%')) AND ( m.idUser =:idUser ) )", Mail.class)
                     .setParameter("author", author)
                     .setParameter("topic", topic)
-                    .setParameter("receiver", receiver)
                     .setParameter("idUser", user)
                     .getResultList();
         } catch (Exception e) {
@@ -78,7 +75,7 @@ public class MailFacade extends AbstractFacade<Mail> {
     public List<Mail> findByLoggedUser(User user) {
         List<Mail> result;
         try {
-            result = getEntityManager().createNativeQuery("SELECT * FROM Mail WHERE idUser = " + user.getIdUser() + " GROUP BY BINARY messageTopic", Mail.class).getResultList();
+            result = getEntityManager().createNativeQuery("SELECT DISTINCT * FROM Mail WHERE idUser = " + user.getIdUser() + " GROUP BY messageTopic", Mail.class).getResultList();
         } catch (Exception e) {
             throw new Error(e);
         }

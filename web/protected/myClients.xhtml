@@ -20,12 +20,9 @@
                     <p:menuitem value="Dodaj etykiete" outcome="createEtiquette.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Wiadomości" icon="pi pi-envelope">
-                    <p:menuitem value="Moje wiadomości" outcome="mainPage.xhtml"/>
+                    <p:menuitem value="Mój mailing" outcome="mainPage.xhtml"/>
                     <p:menuitem value="Wyślij wiadomość" outcome="sendMessage.xhtml" />
-                    <p:menuitem value="Wysłane wiadomości" outcome="addressedMessage.xhtml"/>
-                    <p:menuitem value="Oczekujące wiadomości" outcome="pendingMessage.xhtml" />
-                    <p:menuitem value="Kolejka wiadomości" outcome="queuedMessage.xhtml" />
-                    <p:menuitem value="Wiadomości niewysłane" outcome="failedMessage.xhtml"/> 
+                    <p:menuitem value="Moje wiadomości" outcome="addressedMessage.xhtml"/>
                 </p:submenu>
                 <p:submenu label="Klienci" icon="pi pi-user">
                     <p:menuitem value="Moi klienci" outcome="myClients.xhtml"/>
@@ -36,74 +33,61 @@
             </p:menubar>
         </h:form>
 
-        <p:tabView dynamic="true" cache="false">
-            <p:tab title="Lista klientów" id="clientTab">
-                <h:form id="clientsForm">
-                    <p:dataTable id="groupTable" 
-                                 class="groupTable" 
-                                 value="#{displayClients.clientList}" 
-                                 var="c" 
-                                 style="width: 100%;" 
-                                 paginator="true" 
-                                 rows="10"
-                                 lazy="true"
-                                 editable="true"
-                                 editMode="cell"
-                                 rowsPerPageTemplate="5,10,15,20,50"    
-                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"                         
-                                 >
-                        <p:ajax event="cellEdit" listener="#{displayClients.onCellEdit}" update="groupTable" />
-                        <p:column headerText="Imie">
-                            <h:outputText value="#{c.name}"/>
-                        </p:column>                
-                        <p:column headerText="Email">
-                            <h:outputText value="#{c.email}"/>
-                        </p:column>
-                        <p:column headerText="Status" class="hover">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{c.status == '1' ? 'aktywny' : 'nieaktywny'}" />
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{c.status}" label="status" />
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>                
-                        <p:column headerText="Usuń">
-                            <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="@form"/>
-                        </p:column>
-                    </p:dataTable>
-                </h:form>
+        <p:panel>
+            <h:form id="clientsForm">
+                <p:dataTable id="groupTable" 
+                             class="groupTable" 
+                             value="#{displayClients.clientList}" 
+                             var="c" 
+                             style="width: 100%;" 
+                             paginator="true" 
+                             rows="20"
+                             lazy="true"
+                             editable="true"
+                             editMode="cell"
+                             rowsPerPageTemplate="20,30,40,50"    
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate= "Liczba rekordów: {totalRecords}"                   
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="Lista klientów"/>
+                    </f:facet>
+                    <p:ajax event="cellEdit" listener="#{displayClients.onCellEdit}" update="groupTable" />
+                    <p:column headerText="Imie">
+                        <h:outputText value="#{c.name}"/>
+                    </p:column>                
+                    <p:column headerText="Email">
+                        <h:outputText value="#{c.email}"/>
+                    </p:column>                    
+                    <p:column headerText="Opcje">
+                        <p:panelGrid layout="grid" columns="2" >
+                            <p:commandButton value="Szczegóły" oncomplete="PF('clientDialog').show();" update=":clientDetail">
+                                <f:setPropertyActionListener target="#{displayClients.selectedClient}" value="#{c}" />
+                            </p:commandButton>
+                            <p:commandButton value="Usuń" action="#{displayClients.delete(c)}" update="clientsForm:groupTable"/>
+                        </p:panelGrid>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
 
-            </p:tab>
-            <p:tab title="Szczegóły">
-                <h:form id="clientDetail">
-                    <p:dataTable id="groupTable" 
-                                 class="groupTable" 
-                                 value="#{displayClients.clientList}" 
-                                 var="c" 
-                                 style="width: 100%;" 
-                                 paginator="true" 
-                                 rows="10"
-                                 lazy="true"
-                                 rowsPerPageTemplate="5,10,15,20,50"    
-                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"                         
-                                 >
-                        <p:column headerText="Imie">
-                            <h:outputText value="#{c.name}"/>
-                        </p:column>
-                        <p:column headerText="Przypisane etykiety">
-                            <h:outputText rendered="#{empty c.etiquetteCollection}" value="Brak etykiet"/>
-                            <ui:repeat rendered="#{not empty c.etiquetteCollection}" value="#{c.etiquetteCollection}" var="etiquette">
-                                <h:outputText style="background: rgb(0, 115, 255); color:white; padding: 3px 15px; border-radius: 5px; margin: 0 5px;" value="#{etiquette.name} "/>
-                            </ui:repeat>
-                        </p:column>
-                    </p:dataTable>
+            <p:dialog widgetVar="clientDialog" id="clientDetail" closeOnEscape="true" resizable="false">
+                <h:form style="width: 40vw; ">
+                    <p:panelGrid layout="grid" columns="2" styleClass="clientDetailLayout"  >
+                        <p:outputLabel value="Email" />
+                        <p:outputLabel value="#{displayClients.selectedClient.email}"/>
+
+                        <p:outputLabel value="Status" />
+                        <p:outputLabel value="#{displayClients.selectedClient.status == 1 ? 'Aktywny' : 'Nieaktywny' }"/>
+
+                        <p:outputLabel value="Lista etykiet" />
+                        <ui:repeat value="#{displayClients.selectedClient.etiquetteCollection}" var="e">
+                            <p:outputLabel value="#{e.name}" styleClass="outputEtiquette" />
+                        </ui:repeat>
+                    </p:panelGrid>
                 </h:form>
-            </p:tab>
-        </p:tabView>
+            </p:dialog>
+
+        </p:panel>
     </h:body>
 </html>
 
